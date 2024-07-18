@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "world.hpp"
 #include <json/json.h>
 #include <iostream>
 #include <cmath>
@@ -37,6 +38,9 @@ Sphere::Sphere(Json::Value& input){
     }
 }
 Vec4f Object::getPosition(){ return position;}
+Vec3f Object::getAmbient(){ return ambient;}
+Vec3f Object::getDiffuse(){ return diffuse;}
+int Object::getShininess() {return shininess;}
 
 void Object::setColor(Json::Value& color){
     // error handling falls etwas nicht gegeben ist
@@ -51,7 +55,7 @@ void Object::setColor(Json::Value& color){
     shininess = color["shininess"].asInt();
 }
 
-Vec3b Sphere::intersection(const Vec4f& S, const Vec4f& d){
+Vec3f Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
     Vec4f C = getPosition();
     Vec4f SC = C - S;
     float scalarProd = scalarProduct(d, SC);
@@ -81,8 +85,10 @@ Vec3b Sphere::intersection(const Vec4f& S, const Vec4f& d){
 
     // calculate Position
     Vec4f intersectionPosition = S + t * d;
-
-    return Vec3b(255, 0, 255);
+    Vec4f normal = (C - intersectionPosition) / radius;
+    Vec3f value = scene->mixLight(-d, intersectionPosition, normal, this);
+    // cout << "intersection: " << value << endl;
+    return value;
 
 }
 

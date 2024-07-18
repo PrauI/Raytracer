@@ -1,5 +1,7 @@
 #include "light.hpp"
+#include "object.hpp"
 #include <iostream>
+#include <math.h>
 
 using std::cout;
 using std::endl;
@@ -39,4 +41,26 @@ Source::Source(Json::Value& input){
     }else{
         // error handling
     }
+}
+
+Vec3f Ambient::lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object){
+    Vec3f Ea;
+    Vec3f Ka = object->getAmbient();
+    for(int i = 0; i < 3; i++){
+        Ea[i] = intensity[i] * Ka[i];
+    }
+    return Ea;
+}
+
+Vec3f Source::lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object){
+    // Diffuse component
+    Vec3f Ed;
+    Vec3f Kd = object->getDiffuse();
+    Vec4f L = position - P;
+    float scalar = scalarProduct(L, N);
+    for(int i = 0; i < 3; i++){
+        Ed[i] = Kd[i] * intensity[i] * pow(scalar, object->getShininess());
+    }
+    return Ed;
+
 }
