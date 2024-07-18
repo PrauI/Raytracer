@@ -29,8 +29,27 @@ Sphere::Sphere(Json::Value& input){
     else{
         // error weil wir brauchen einen radius
     }
+
+    if(input.isMember("color")){
+        Json::Value color = input["color"];
+        setColor(color);
+
+    }
 }
 Vec4f Object::getPosition(){ return position;}
+
+void Object::setColor(Json::Value& color){
+    // error handling falls etwas nicht gegeben ist
+
+    for(int i = 0; i < 3; i++){
+        ambient[i] = color["ambient"][i].asInt();
+        diffuse[i] = color["diffuse"][i].asInt();
+        specular[i] = color["specular"][i].asInt();
+        reflected[i] = color["reflected"][i].asInt();
+        refracted[i] = color["refracted"][i].asInt();
+    }
+    shininess = color["shininess"].asInt();
+}
 
 Vec3b Sphere::intersection(const Vec4f& S, const Vec4f& d){
     Vec4f C = getPosition();
