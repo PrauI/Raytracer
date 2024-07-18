@@ -4,12 +4,14 @@
 #include <json/json.h>
 #include <string>
 #include "camera.hpp"
+#include "light.hpp"
 #include "object.hpp"
 #include <vector>
 using std::string;
 
 class World {
     Camera camera;
+    std::vector<Light*> lightList;
     std::vector<Object*> objectList;
 public:
     World();

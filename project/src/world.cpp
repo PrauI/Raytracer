@@ -1,5 +1,6 @@
 #include "world.hpp"
 #include "object.hpp"
+#include "light.hpp"
 #include <iostream>
 #include <json/json.h>
 #include <fstream>
@@ -19,6 +20,21 @@ void World::readFile(const string& filename) {
     Json::Value screen;
     screen = scene["screen"];
     camera = Camera(screen);
+
+    // setup Lights
+    Json::Value medium;
+    medium = scene["medium"];
+    lightList.push_back(new Ambient(medium));
+
+    Json::Value sources = scene["sources"];
+    cout << "Light Sources: " << endl;
+    if(sources.isArray()){
+        for(int i = 0; i < int(sources.size()); i++){
+            lightList.push_back(new Source(sources[i]));
+        }
+    }else{
+        // error handling..
+    }
 
     // setup objects
     Json::Value objects;
