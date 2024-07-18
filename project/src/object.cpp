@@ -32,7 +32,7 @@ Sphere::Sphere(Json::Value& input){
 }
 Vec4f Object::getPosition(){ return position;}
 
-Vec3b Sphere::intersection(Vec4f& S, Vec4f& d){
+Vec3b Sphere::intersection(const Vec4f& S, const Vec4f& d){
     Vec4f C = getPosition();
     Vec4f SC = C - S;
     float scalarProd = scalarProduct(d, SC);
@@ -60,6 +60,9 @@ Vec3b Sphere::intersection(Vec4f& S, Vec4f& d){
         return Vec3b(0, 0, 0); // Beide t1 und t2 sind negativ
     }
 
+    // calculate Position
+    Vec4f intersectionPosition = S + t * d;
+
     return Vec3b(255, 0, 255);
 
 }
@@ -68,6 +71,6 @@ float length(Vec4f& x){
     return sqrt(pow(x[0],2) + pow(x[1], 2) + pow(x[2], 2) + pow(x[3], 2));
 }
 
-float scalarProduct(Vec4f& a, Vec4f& b){
+float scalarProduct(const Vec4f& a, const Vec4f& b){
     return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
 }

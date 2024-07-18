@@ -13,7 +13,7 @@ private:
 public:
     void setPosition(Json::Value& input);
     Vec4f getPosition();
-    virtual Vec3b intersection(Vec4f& S, Vec4f& d) = 0;
+    virtual Vec3b intersection(const Vec4f& S, const Vec4f& d) = 0;
 };
 
 class Sphere: public Object{
@@ -23,10 +23,10 @@ private:
 public:
     Sphere(Json::Value& input);
 
-    Vec3b intersection(Vec4f& S, Vec4f& d);
+    Vec3b intersection(const Vec4f& S, const Vec4f& d);
 };
 
 float length(Vec4f& x);
-float scalarProduct(Vec4f& a, Vec4f& b);
+float scalarProduct(const Vec4f& a, const Vec4f& b);
 
 #endif
