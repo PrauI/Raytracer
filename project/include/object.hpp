@@ -25,6 +25,7 @@ public:
     Vec4f getPosition();
     Vec3f getAmbient();
     Vec3f getDiffuse();
+    Vec3f getSpecular();
     int getShininess();
     virtual Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene) = 0;
 };

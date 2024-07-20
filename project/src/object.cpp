@@ -41,6 +41,7 @@ Vec4f Object::getPosition(){ return position;}
 Vec3f Object::getAmbient(){ return ambient;}
 Vec3f Object::getDiffuse(){ return diffuse;}
 int Object::getShininess() {return shininess;}
+Vec3f Object::getSpecular(){ return specular;}
 
 void Object::setColor(Json::Value& color){
     // error handling falls etwas nicht gegeben ist

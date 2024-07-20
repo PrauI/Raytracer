@@ -1,5 +1,6 @@
 #include "light.hpp"
 #include "object.hpp"
+#include "world.hpp"
 #include <iostream>
 #include <math.h>
 
@@ -63,6 +64,20 @@ Vec3f Source::lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object*
     for(int i = 0; i < 3; i++){
         Ed[i] = Kd[i] * intensity[i] * pow(scalar, object->getShininess());
     }
-    return Ed;
+
+
+    // specular component
+    Vec3f Es;
+    Vec3f Ks = object->getSpecular();
+    Vec4f R = L - 2* scalarProduct(L, N) * N;
+    cv::normalize(V,V);
+    scalar = scalarProduct(R, V);
+    for(int i = 0; i < 3; i++){
+        Es[i] = Ks[i] * intensity[i] * pow(scalar, object->getShininess());
+    }
+
+
+
+    return addLight(Es, Ed);
 
 }
