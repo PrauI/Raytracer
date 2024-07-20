@@ -28,5 +28,6 @@ public:
 };
 
 Vec3b map255(const Vec3f& color);
+Vec3f addLight(Vec3f& color1, Vec3f& color2);
 
 #endif // WORLD_HPP

@@ -85,7 +85,8 @@ Vec3f Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
 
     // calculate Position
     Vec4f intersectionPosition = S + t * d;
-    Vec4f normal = (C - intersectionPosition) / radius;
+    Vec4f normal = C - intersectionPosition;
+    cv::normalize(normal, normal);
     Vec3f value = scene->mixLight(-d, intersectionPosition, normal, this);
     // cout << "intersection: " << value << endl;
     return value;

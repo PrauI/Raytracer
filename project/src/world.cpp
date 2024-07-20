@@ -82,10 +82,7 @@ void World::calcMatrix(){
         //     camera.matrix.at<cv::Scalar>(y,x) = object->intersection();
         // }
         Vec3f color = objectList[0]->intersection(S, d, this);
-        // cout << color << endl;
-        Vec3b rgbColor = map255(color);
-        // cout << color << rgbColor << endl;
-        camera.matrix.at<cv::Vec3b>(y,x) = rgbColor;;
+        camera.matrix.at<cv::Vec3b>(y,x) = map255(color);
     }
     }
     
@@ -100,9 +97,24 @@ Vec3b map255(const Vec3f& color){
 }
 
 Vec3f World::mixLight(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object){
+    // Vec3f color = lightList[0]->lightValue(V, P, N, object);
     Vec3f color = {0,0,0};
     for(auto light : lightList){
-        color += light->lightValue(V, P, N, object);
+        Vec3f incomingColor = light->lightValue(V, P, N, object);
+        color = addLight(color, incomingColor);
+        // color += incomingColor;
+        if(color[0] != 0) cout << color << endl;
+    }
+    for(int i = 0; i < 3; i++){
+        if(color[i] > 1) color[i] = 1;
     }
     return color;
+}
+
+Vec3f addLight(Vec3f& color1, Vec3f& color2){
+    Vec3f finalColor = {0,0,0};
+    for(int i = 0; i < 3; i++){
+        finalColor[i] = 1.0 - (1.0 - color1[i]) * (1.0 - color2[i]);
+    }
+    return finalColor;
 }
