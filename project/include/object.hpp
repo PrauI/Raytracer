@@ -16,7 +16,7 @@ private:
     Vec3f specular;
     Vec3f reflected;
     Vec3f refracted;
-    int shininess;
+    float shininess;
 
 
 public:
@@ -26,7 +26,7 @@ public:
     Vec3f getAmbient();
     Vec3f getDiffuse();
     Vec3f getSpecular();
-    int getShininess();
+    float getShininess();
     virtual Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene) = 0;
 };
 

@@ -40,7 +40,7 @@ Sphere::Sphere(Json::Value& input){
 Vec4f Object::getPosition(){ return position;}
 Vec3f Object::getAmbient(){ return ambient;}
 Vec3f Object::getDiffuse(){ return diffuse;}
-int Object::getShininess() {return shininess;}
+float Object::getShininess() {return shininess;}
 Vec3f Object::getSpecular(){ return specular;}
 
 void Object::setColor(Json::Value& color){
@@ -53,7 +53,7 @@ void Object::setColor(Json::Value& color){
         reflected[i] = color["reflected"][i].asInt();
         refracted[i] = color["refracted"][i].asInt();
     }
-    shininess = color["shininess"].asInt();
+    shininess = color["shininess"].asFloat();
 }
 
 Vec3f Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){

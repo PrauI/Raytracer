@@ -103,7 +103,6 @@ Vec3f World::mixLight(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* ob
         Vec3f incomingColor = light->lightValue(V, P, N, object);
         color = addLight(color, incomingColor);
         // color += incomingColor;
-        if(color[0] != 0) cout << color << endl;
     }
     for(int i = 0; i < 3; i++){
         if(color[i] > 1) color[i] = 1;

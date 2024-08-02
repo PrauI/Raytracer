@@ -60,6 +60,7 @@ Vec3f Source::lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object*
     Vec4f L = position - P;
     cv::normalize(L,L);
     float scalar = scalarProduct(L, N);
+    if(scalar < 0) scalar = 0;
 
     // specular component
     Vec3f Es;
@@ -67,6 +68,7 @@ Vec3f Source::lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object*
     Vec4f R = L - 2* scalarProduct(L, N) * N;
     cv::normalize(V,V);
     float scalar2 = scalarProduct(R, V);
+    if(scalar2 < 0) scalar2 = 0;
  
      for(int i = 0; i < 3; i++){
         Ed[i] = Kd[i] * intensity[i] * pow(scalar, object->getShininess());
