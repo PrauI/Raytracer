@@ -24,8 +24,8 @@
     ],
     
     "objects": [
-        {"translation":{
-            "factors": [1.0,0,0],
+        {"scaling":{
+            "factors": [1.0,2.0,1.0],
             "subject": {
                 "sphere": {
                     "position": [0, 0, 0],

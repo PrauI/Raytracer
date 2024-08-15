@@ -69,7 +69,25 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
     }
     else if(object.isMember("halfspace")) return; // to implement
     else if(object.isMember("union")) return; // to implement
-    else if(object.isMember("scaling")) return; // to implement
+    else if(object.isMember("scaling")){
+        Json::Value scaling = object["scaling"];
+        try{
+            if(!scaling.isMember("factors")) throw std::runtime_error("No Factors provided for Scaling");
+            Json::Value factors = scaling["factors"];
+            if(!factors.isArray() || factors.size() != 3) throw std::runtime_error("Provided Factors for Scaling  are not in the correct Format");
+            Mat translationMatrix = (cv::Mat_<float>(4,4) << 
+                                            factors[0].asFloat(), 0.0, 0.0, 0.0,
+                                            0.0, factors[1].asFloat(), 0.0, 0.0,
+                                            0.0, 0.0, factors[2].asFloat(), 0.0,
+                                            0.0, 0.0, 0.0, 1.0);
+            matrix = matrix * translationMatrix; 
+        }catch(const std::exception& e){
+            std::cerr << e.what() << endl;
+            cout << "Rendering proceeds without scaling" << endl;
+        }
+        if(!scaling.isMember("subject")) throw std::runtime_error("No subject Provided for Scaling");
+        setupObjects(scaling["subject"], matrix);
+    }
     else if(object.isMember("translation")){
         Json::Value translation = object["translation"];
         try
@@ -77,9 +95,12 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
             if(!translation.isMember("factors")) throw std::runtime_error("No Factors provided for Translation");
             Json::Value factors = translation["factors"];
             if(!factors.isArray() || factors.size() != 3) throw std::runtime_error("Provided Factors for Translation are not in the correct Format");
-            matrix.at<float>(0,3) = factors[0].asFloat();
-            matrix.at<float>(1,3) = factors[1].asFloat();
-            matrix.at<float>(2,3) = factors[2].asFloat();
+            Mat translationMatrix = (cv::Mat_<float>(4,4) << 
+                                            1.0, 0.0, 0.0, factors[0].asFloat(),
+                                            0.0, 1.0, 0.0, factors[1].asFloat(),
+                                            0.0, 0.0, 1.0, factors[2].asFloat(),
+                                            0.0, 0.0, 0.0, 1.0);
+            matrix = matrix * translationMatrix;
         }
         catch(const std::exception& e)
         {
