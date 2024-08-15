@@ -60,8 +60,12 @@ void Object::setColor(Json::Value& color){
 
 Vec3f Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
     Vec4f C = getPosition();
-    Vec4f SC = C - S;
-    float scalarProd = scalarProduct(d, SC);
+    Mat resultD = transformationMatrix.inv() * d;
+    Vec4f dm = resultD;
+    Mat resultS = transformationMatrix.inv() * S;
+    Vec4f Sm = resultS;
+    Vec4f SC = C - Sm;
+    float scalarProd = scalarProduct(dm, SC);
     float SC_length = length(SC);
     float delta = pow(radius, 2) - pow(SC_length, 2) + pow(scalarProd, 2);
     
@@ -87,7 +91,7 @@ Vec3f Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
     }
 
     // calculate Position
-    Vec4f intersectionPosition = S + t * d;
+    Vec4f intersectionPosition = Sm + t * dm;
     Vec4f normal = C - intersectionPosition;
     cv::normalize(normal, normal);
     Vec3f value = scene->mixLight(-d, intersectionPosition, normal, this);

@@ -25,7 +25,7 @@
     
     "objects": [
         {"translation":{
-            "factors": [0,0, 1.0],
+            "factors": [1.0,0,0],
             "subject": {
                 "sphere": {
                     "position": [0, 0, 0],

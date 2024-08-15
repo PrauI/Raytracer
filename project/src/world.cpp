@@ -77,9 +77,9 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
             if(!translation.isMember("factors")) throw std::runtime_error("No Factors provided for Translation");
             Json::Value factors = translation["factors"];
             if(!factors.isArray() || factors.size() != 3) throw std::runtime_error("Provided Factors for Translation are not in the correct Format");
-            matrix.at<float>(3,0) = factors[0].asFloat();
-            matrix.at<float>(3,1) = factors[1].asFloat();
-            matrix.at<float>(3,2) = factors[2].asFloat();
+            matrix.at<float>(0,3) = factors[0].asFloat();
+            matrix.at<float>(1,3) = factors[1].asFloat();
+            matrix.at<float>(2,3) = factors[2].asFloat();
         }
         catch(const std::exception& e)
         {
