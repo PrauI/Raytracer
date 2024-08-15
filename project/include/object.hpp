@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include "world.hpp"
 
-using cv::Vec4f, cv::Vec3b, cv::Vec3f;
+using cv::Vec4f, cv::Vec3b, cv::Vec3f, cv::Mat;
 
 class World;
 
@@ -20,6 +20,7 @@ private:
 
 
 public:
+    Mat transformationMatrix;
     void setPosition(Json::Value& input);
     void setColor(Json::Value& color);
     Vec4f getPosition();
@@ -35,7 +36,7 @@ private:
     float radius;
 
 public:
-    Sphere(Json::Value& input);
+    Sphere(Json::Value& input, Mat& matrix);
 
     Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene);
 };

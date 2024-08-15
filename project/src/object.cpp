@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cmath>
 
-using std::cout, std::endl;
+using std::cout, std::endl, cv::Mat;
 
 void Object::setPosition(Json::Value& input){
     if(input.isArray() && input.size() == 3){
@@ -17,7 +17,7 @@ void Object::setPosition(Json::Value& input){
     }
 }
 
-Sphere::Sphere(Json::Value& input){
+Sphere::Sphere(Json::Value& input, Mat& matrix){
     if(input.isMember("position")){
         Json::Value inputPosition = input["position"];
         setPosition(inputPosition);
@@ -36,6 +36,8 @@ Sphere::Sphere(Json::Value& input){
         setColor(color);
 
     }
+
+    transformationMatrix = matrix;
 }
 Vec4f Object::getPosition(){ return position;}
 Vec3f Object::getAmbient(){ return ambient;}

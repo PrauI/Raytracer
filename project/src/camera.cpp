@@ -74,7 +74,7 @@ Camera::Camera(Json::Value& jfile){
         }else throw std::runtime_error("No 'observer' member in file.");
     }catch(const std::exception& e){
        std::cerr << "! Warning 'observer': " << e.what() << " Using 1, 2, -10" << endl; 
-       observerPosition[0] = 1; observerPosition[1] = 2; observerPositoin[2] = -10; observerPosition[3] = 1;
+       observerPosition[0] = 1; observerPosition[1] = 2; observerPosition[2] = -10; observerPosition[3] = 1;
     }
     cout << "Observer: (" << observerPosition[0] << ", " << observerPosition[1] << ", " << observerPosition[2] << ")" << std::endl;
 

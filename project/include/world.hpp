@@ -23,6 +23,7 @@ public:
     void readFile(const string& filename);
     void createImage(const string& filename);
     void readObjects(Json::Value& objects);
+    void setupObjects(Json::Value& object, Mat& matrix);
     void calcMatrix();
     Vec3f mixLight(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object);
 };
