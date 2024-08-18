@@ -67,7 +67,10 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
         finalObject = new Sphere(object["sphere"], matrix);
         objectList.push_back(finalObject);
     }
-    else if(object.isMember("halfspace")) return; // to implement
+    else if(object.isMember("halfSpace")){
+        finalObject = new Halfspace(object["halfSpace"], matrix);
+        objectList.push_back(finalObject);
+    }
     else if(object.isMember("union")) return; // to implement
     else if(object.isMember("scaling")){
         Json::Value scaling = object["scaling"];
@@ -80,7 +83,7 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
                                             0.0, factors[1].asFloat(), 0.0, 0.0,
                                             0.0, 0.0, factors[2].asFloat(), 0.0,
                                             0.0, 0.0, 0.0, 1.0);
-            matrix = matrix * translationMatrix; 
+            matrix = translationMatrix * matrix; 
         }catch(const std::exception& e){
             std::cerr << e.what() << endl;
             cout << "Rendering proceeds without scaling" << endl;
@@ -100,7 +103,7 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
                                             0.0, 1.0, 0.0, factors[1].asFloat(),
                                             0.0, 0.0, 1.0, factors[2].asFloat(),
                                             0.0, 0.0, 0.0, 1.0);
-            matrix = matrix * translationMatrix;
+            matrix = translationMatrix * matrix;
         }
         catch(const std::exception& e)
         {

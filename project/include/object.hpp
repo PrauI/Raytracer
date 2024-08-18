@@ -1,12 +1,16 @@
 #ifndef OBJECT_HPP
 #define OBJECT_HPP
 #include <json/json.h>
+#include <vector>
 #include <opencv2/opencv.hpp>
 #include "world.hpp"
 
 using cv::Vec4f, cv::Vec3b, cv::Vec3f, cv::Mat;
 
 class World;
+
+#define Origin  Vec4f(0,0,0,1);
+#define EPSILON 0.00001;
 
 class Object{
 private:
@@ -22,6 +26,7 @@ private:
 public:
     Mat transformationMatrix;
     void setPosition(Json::Value& input);
+    void setDefaultPosition();
     void setColor(Json::Value& color);
     Vec4f getPosition();
     Vec3f getAmbient();
@@ -39,6 +44,17 @@ public:
     Sphere(Json::Value& input, Mat& matrix);
 
     Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene);
+};
+
+class Halfspace: public Object{
+private:
+    Vec4f normal;
+
+public:
+    Halfspace(Json::Value& input, Mat& matrix);
+    Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene);
+    void setNormal(Json::Value& input);
+    void setDefaultNormal();
 };
 
 float length(Vec4f& x);
