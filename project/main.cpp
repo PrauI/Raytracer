@@ -19,7 +19,7 @@ int main() {
 
     // Einlesen der Parameter zum Erstellen einer Szene / Welt
     world.readFile(inputFile);
-    // calcMatrix berchnet das Bild und speichert die Daten in einer Matrix
+     // calcMatrix berchnet das Bild und speichert die Daten in einer Matrix
     world.calcMatrix();
     // createImage wandelt die zuvor berechnete Matrix in eine png-Datei um
     world.createImage(filename);

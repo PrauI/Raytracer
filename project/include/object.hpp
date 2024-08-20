@@ -12,6 +12,17 @@ class World;
 #define Origin  Vec4f(0,0,0,1);
 #define EPSILON 0.00001;
 
+class Object;
+
+struct intersectionInfo{
+    bool didHit;
+    float t;
+    Vec4f position;
+    Vec4f normal;
+    Vec4f dir;
+    Object* object;
+};
+
 class Object{
 private:
     Vec4f position;
@@ -33,7 +44,7 @@ public:
     Vec3f getDiffuse();
     Vec3f getSpecular();
     float getShininess();
-    virtual Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene) = 0;
+    virtual struct intersectionInfo* intersection(const Vec4f& S, const Vec4f& d, World* scene) = 0;
 };
 
 class Sphere: public Object{
@@ -43,7 +54,7 @@ private:
 public:
     Sphere(Json::Value& input, Mat& matrix);
 
-    Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene);
+    struct intersectionInfo* intersection(const Vec4f& S, const Vec4f& d, World* scene);
 };
 
 class Halfspace: public Object{
@@ -52,13 +63,15 @@ private:
 
 public:
     Halfspace(Json::Value& input, Mat& matrix);
-    Vec3f intersection(const Vec4f& S, const Vec4f& d, World* scene);
+    struct intersectionInfo* intersection(const Vec4f& S, const Vec4f& d, World* scene);
     void setNormal(Json::Value& input);
     void setDefaultNormal();
 };
 
 float length(Vec4f& x);
 float scalarProduct(const Vec4f& a, const Vec4f& b);
+
+
 
 
 #endif

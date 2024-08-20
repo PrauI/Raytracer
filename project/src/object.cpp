@@ -25,23 +25,44 @@ void Object::setDefaultPosition(){
 
 
 Sphere::Sphere(Json::Value& input, Mat& matrix){
-    if(input.isMember("position")){
+
+    // set position
+    try
+    {
+        if(!input.isMember("position")) throw std::runtime_error("No Position provided for Sphere");
         Json::Value inputPosition = input["position"];
+        if(!inputPosition.isArray() || inputPosition.size() != 3) throw std::runtime_error("No correct Format given for Sphere Position");
         setPosition(inputPosition);
-    }else{
-        // error weil wir brauchen eine position
-        cout << "No Position given for sphere" << endl;
     }
-
-    if(input.isMember("radius")) radius = input["radius"].asFloat();
-    else{
-        // error weil wir brauchen einen radius
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        cout << "Proceeding with Position 0,0,0" << endl;
+        setDefaultPosition();
     }
-
-    if(input.isMember("color")){
-        Json::Value color = input["color"];
-        setColor(color);
-
+    
+    // set radius
+    try
+    {
+       if(!input.isMember("radius")) throw std::runtime_error("No Radius provided for Sphere");
+       radius = input["radius"].asFloat();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        cout << "Proceeding with radius 1.0" << endl;
+        radius = 1.0;
+    }
+    
+    // set color
+    try{
+        if(!input.isMember("color")) throw std::runtime_error("No Color provided for Sphere");
+        Json::Value inputColor = input["color"];
+        setColor(inputColor);
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+        cout << "Proceeding with default colors" << endl;
+        // todo defaultColor
     }
 
     transformationMatrix = matrix;
@@ -65,45 +86,43 @@ void Object::setColor(Json::Value& color){
     shininess = color["shininess"].asFloat();
 }
 
-Vec3f Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
+struct intersectionInfo* Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
+    intersectionInfo* result = new intersectionInfo;
+    result->didHit = false;
+    result->object = this;
+
     Vec4f C = getPosition();
     Mat resultD = transformationMatrix.inv() * d;
     Vec4f dm = resultD;
+    cv::normalize(dm, dm);
+    result->dir = -dm;
+    // dm = dm * -1;
     Mat resultS = transformationMatrix.inv() * S;
     Vec4f Sm = resultS;
-    Vec4f SC = C - Sm;
-    float scalarProd = scalarProduct(dm, SC);
-    float SC_length = length(SC);
-    float delta = pow(radius, 2) - pow(SC_length, 2) + pow(scalarProd, 2);
-    
-    if (delta < 0) {
-        // Keine Schnittpunkte
-        return Vec3b(0, 0, 0);
-    }
 
-    float sqrtDelta = sqrt(delta);
-    float t1 = scalarProd + sqrtDelta;
-    float t2 = scalarProd - sqrtDelta;
-    float t;
+    Vec4f offsetRayOrigin = Sm - C;
+    float a = scalarProduct(dm, dm);
+    float b = 2 * scalarProduct(offsetRayOrigin, dm);
+    float c = scalarProduct(offsetRayOrigin, offsetRayOrigin) - radius * radius;
 
-    if (t1 >= 0 && t2 >= 0) {
-        t = (t1 < t2) ? t1 : t2;
-    } else if (t1 >= 0) {
-        t = t1;
-    } else if (t2 >= 0) {
-        t = t2;
-    } else {
-        cout << t1 << t2 << endl;
-        return Vec3b(0, 0, 0); // Beide t1 und t2 sind negativ
-    }
+    float discriminant = b * b - 4 * a * c;
 
-    // calculate Position
-    Vec4f intersectionPosition = Sm + t * dm;
-    Vec4f normal = intersectionPosition - C;
+    // no solution when d < 0 (ray misses sphere)
+    if(discriminant < 0) return result;
+    // else:
+    result->didHit = true;
+
+    float t = (-b - sqrt(discriminant)) / (2 * a);
+    result->t = t;
+
+    Vec4f intersectionPoint = Sm + dm * t;
+    result->position = intersectionPoint;
+    Vec4f normal = intersectionPoint - C;
     cv::normalize(normal, normal);
-    Vec3f value = scene->mixLight(dm, intersectionPosition, normal, this);
+    result->normal = normal;
+
     // cout << "intersection: " << value << endl;
-    return value;
+    return result;
 
 }
 
@@ -167,26 +186,35 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
     transformationMatrix = matrix;
 }
 
-Vec3f Halfspace::intersection(const Vec4f& S, const Vec4f& d, World* scene){
+struct intersectionInfo* Halfspace::intersection(const Vec4f& S, const Vec4f& d, World* scene){
+    struct intersectionInfo* result = new intersectionInfo;
+    result->didHit = false;
+    result->object = this;
+
     Mat resultD = transformationMatrix.inv() * d;
     Vec4f dm = resultD;
     cv::normalize(dm, dm);
+    result->dir = -dm;
     Mat resultS = transformationMatrix.inv() * S;
     Vec4f Sm = resultS;
  
    // since a halfspace is an infinite plane the there is either an intersection point or the ray coming from the camera is parallel to the plane
-   float scalarValue = scalarProduct(normal, dm);
+   float scalarValue = scalarProduct(this->normal, dm);
    // cout << "normal: " << normal << " d: " << dm << " scalar: " << scalarValue << endl;
-   if(scalarValue < 0.0001) return Vec3b(0,0,0); // they are parallel and there is no intersection
+   if(scalarValue > -0.0001) return result; // they are parallel and there is no intersection
    Vec4f pos = getPosition();
 
    float t = scalarProduct(pos - Sm, normal) / scalarValue;
-    if(t > 0) return Vec3b(0,0,0); // intersection Point behind camera
+    if(t < 0) return result; // intersection Point behind camera
+    if(t > 80) return result; // todo maybe change or delete
+
+    result->t = t;
+    result->didHit = true;
 
     Vec4f intersectionPoint = Sm + t * dm;
+    result->position = intersectionPoint;
 
+    result->normal = normal;
 
-
-    Vec3f value = scene->mixLight(-dm, intersectionPoint, normal, this);
-    return value;    
+    return result;    
 }

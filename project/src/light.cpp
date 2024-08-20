@@ -44,35 +44,35 @@ Source::Source(Json::Value& input){
     }
 }
 
-Vec3f Ambient::lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object){
+Vec3f Ambient::lightValue(struct intersectionInfo* info){
     Vec3f Ea;
-    Vec3f Ka = object->getAmbient();
+    Vec3f Ka = info->object->getAmbient();
     for(int i = 0; i < 3; i++){
         Ea[i] = intensity[i] * Ka[i];
     }
     return Ea;
 }
 
-Vec3f Source::lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object){
+Vec3f Source::lightValue(struct intersectionInfo* info){
     // Diffuse component
     Vec3f Ed;
-    Vec3f Kd = object->getDiffuse();
-    Vec4f L = position - P;
+    Vec3f Kd = info->object->getDiffuse();
+    Vec4f L = position - info->position;
     cv::normalize(L,L);
-    float scalar = scalarProduct(L, N);
+    float scalar = scalarProduct(L, info->normal);
     if(scalar < 0) scalar = 0;
 
     // specular component
     Vec3f Es;
-    Vec3f Ks = object->getSpecular();
-    Vec4f R = L - 2* scalarProduct(L, N) * N;
-    cv::normalize(V,V);
-    float scalar2 = scalarProduct(R, V);
+    Vec3f Ks = info->object->getSpecular();
+    Vec4f R = L - 2* scalarProduct(L, info->normal) * info->normal;
+    cv::normalize(info->dir, info->dir);
+    float scalar2 = scalarProduct(R, -info->dir);
     if(scalar2 < 0) scalar2 = 0;
  
      for(int i = 0; i < 3; i++){
-        Ed[i] = Kd[i] * intensity[i] * pow(scalar, object->getShininess());
-        Es[i] = Ks[i] * intensity[i] * pow(scalar2, object->getShininess());
+        Ed[i] = Kd[i] * intensity[i] * pow(scalar, info->object->getShininess());
+        Es[i] = Ks[i] * intensity[i] * pow(scalar2, info->object->getShininess());
 
     }
 

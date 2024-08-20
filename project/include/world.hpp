@@ -13,6 +13,7 @@ using std::string, cv::Vec3f, cv::Vec4f, cv::Vec3b;
 
 class Object;
 class Light;
+struct intersectionInfo;
 
 class World {
     Camera camera;
@@ -25,7 +26,7 @@ public:
     void readObjects(Json::Value& objects);
     void setupObjects(Json::Value& object, Mat& matrix);
     void calcMatrix();
-    Vec3f mixLight(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object);
+    Vec3f mixLight(struct intersectionInfo* info);
 };
 
 Vec3b map255(const Vec3f& color);

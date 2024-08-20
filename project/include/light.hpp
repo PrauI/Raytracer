@@ -13,7 +13,7 @@ private:
 
 public:
     Vec3f intensity;
-    virtual Vec3f lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object) = 0;
+    virtual Vec3f lightValue(struct intersectionInfo* info) = 0;
 };
 
 class Ambient: public Light{
@@ -21,7 +21,7 @@ private:
 
 public:
     Ambient(Json::Value& input);
-    Vec3f lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object);
+    Vec3f lightValue(struct intersectionInfo* info);
 
 };
 
@@ -30,7 +30,7 @@ private:
     Vec4f position;
 public:
     Source(Json::Value& input);
-    Vec3f lightValue(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object);
+    Vec3f lightValue(struct intersectionInfo* info);
 };
 
 #endif

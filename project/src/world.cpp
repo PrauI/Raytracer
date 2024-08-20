@@ -114,6 +114,7 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
         if(!translation.isMember("subject")) throw std::runtime_error("No subject Provided for Translation");
         setupObjects(translation["subject"], matrix);
     }
+
 }
 
 
@@ -128,13 +129,35 @@ void World::calcMatrix(){
         Vec4f S = camera.getPosition() + delta;
         Vec4f d = S - camera.getObserver();
         cv::normalize(d,d);
-        // cout << "S: " << S[0] << ", " << S[1] << ", " << S[2] << ", " << S[3];
-        // cout << "d: " << d[0] << ", " << d[1] << ", " << d[2] << ", " << d[3] << endl;
-        // for(Object* object : objectList){
-        //     camera.matrix.at<cv::Scalar>(y,x) = object->intersection();
-        // }
-        Vec3f color = objectList[0]->intersection(S, d, this);
-        camera.matrix.at<cv::Vec3b>(y,x) = map255(color);
+
+        struct intersectionInfo* closestHit = nullptr;
+        for(auto object : objectList){
+            // choosing the closest point of em all
+            struct intersectionInfo* info = object->intersection(S, d, this);    
+            if(info->didHit) {
+                // überprüfe, ob dies der erste Treffer ist oder ob der aktuelle Treffer näher ist als der vorherige
+                if(closestHit == nullptr || info->t < closestHit->t){
+                    delete closestHit;
+                    closestHit = info;  
+                    info = nullptr;    
+                }else{
+                    delete info;
+                    info = nullptr;
+                }
+            }else{
+                delete info;
+                info = nullptr;
+            }
+        }
+        Vec3f color = {0.5,0.7,1.0};
+        if(closestHit != nullptr && closestHit->didHit) color = mixLight(closestHit);
+        else{
+            // sky color
+            // todo irgendwie zerscheißsts die farben. unser himmel ist gelb...
+        }
+        delete closestHit;
+        closestHit = nullptr;
+        camera.matrix.at<cv::Vec3b>(camera.matrix.rows - y,x) = map255(color);
     }
     }
     
@@ -151,11 +174,11 @@ Vec3b map255(const Vec3f& color){
 
 // Calculates Color / Light at a certain intersection point 
 // based on all the lights in the scene
-Vec3f World::mixLight(const Vec4f& V, const Vec4f& P, const Vec4f& N, Object* object){
+Vec3f World::mixLight(struct intersectionInfo* info){
     // Vec3f color = lightList[0]->lightValue(V, P, N, object);
     Vec3f color = {0,0,0};
     for(auto light : lightList){
-        Vec3f incomingColor = light->lightValue(V, P, N, object);
+        Vec3f incomingColor = light->lightValue(info);
         color = addLight(color, incomingColor);
         // color += incomingColor;
     }
