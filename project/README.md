@@ -5,7 +5,7 @@ By Zeynep Tosun, Pascal Hollinger and Philipp Rauser
 - was unser Programm kann
 - wie man es benutzt
 - wie man es installiert vielleicht
-- wie es funktioniert. code description
+- [wie unser code funktioniert](code_description.md)
 
 
 ## Wie das Program Funktioniert:

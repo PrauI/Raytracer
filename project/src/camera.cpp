@@ -12,13 +12,12 @@ Camera::Camera(){}
 Camera::Camera(Json::Value& jfile){
 
     // dpi
-
     try {
         if(jfile.isMember("dpi")) {
             dpi = jfile["dpi"].asInt();
             if(dpi <= 0) throw std::runtime_error("'dpi can't be smaller or equal to one");
             if(dpi > 300) throw std::runtime_error("'dpi' can#t be greater then 300");
-            } else throw std::runtime_error("Kein 'dpi' Mitglied in der Datei gefunden");
+        } else throw std::runtime_error("Kein 'dpi' Mitglied in der Datei gefunden");
     } catch(const std::exception& e) {
         dpi = 62;
         std::cerr << "Warnung: " << e.what() << ". Standardwert '62' wird verwendet." << std::endl;

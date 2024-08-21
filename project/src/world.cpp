@@ -56,7 +56,7 @@ void World::readObjects(Json::Value& objects){
             setupObjects(objects[i], matrix);       
         }
     }else{
-        // fehler weil es soll ein array sein!
+        // todo in try catch umwandeln
     }
 }
 
@@ -71,7 +71,7 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
         finalObject = new Halfspace(object["halfSpace"], matrix);
         objectList.push_back(finalObject);
     }
-    else if(object.isMember("union")) return; // to implement
+    else if(object.isMember("union")) return; // todo
     else if(object.isMember("scaling")){
         Json::Value scaling = object["scaling"];
         try{
