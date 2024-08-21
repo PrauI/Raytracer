@@ -1,3 +1,4 @@
 *.exe
 */main.exe.dSYM
 black_image.png
+Makefile
