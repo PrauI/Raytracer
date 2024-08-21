@@ -8,6 +8,7 @@ using std::cout;
 using std::endl;
 
 Ambient::Ambient(Json::Value& medium){
+    isAmbient = true;
     if(medium.isMember("ambient")){
         const Json::Value ambient = medium["ambient"];
         if(ambient.isArray() && ambient.size() == 3){
@@ -26,6 +27,7 @@ Ambient::Ambient(Json::Value& medium){
 }
 
 Source::Source(Json::Value& input){
+    isAmbient = false;
     if(input.isMember("position") && input.isMember("intensity")){
         Json::Value inputPos = input["position"];
         Json::Value inputIntensity = input["intensity"];
@@ -80,3 +82,5 @@ Vec3f Source::lightValue(struct intersectionInfo* info){
     return addLight(Es, Ed);
 
 }
+
+Vec4f Source::getPosition(){ return position; }

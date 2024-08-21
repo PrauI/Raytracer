@@ -12,6 +12,7 @@ class Light{
 private:
 
 public:
+    bool isAmbient;
     Vec3f intensity;
     virtual Vec3f lightValue(struct intersectionInfo* info) = 0;
 };
@@ -31,6 +32,7 @@ private:
 public:
     Source(Json::Value& input);
     Vec3f lightValue(struct intersectionInfo* info);
+    Vec4f getPosition();
 };
 
 #endif

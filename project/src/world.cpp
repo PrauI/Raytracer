@@ -149,7 +149,7 @@ void World::calcMatrix(){
                 info = nullptr;
             }
         }
-        Vec3f color = {0.5,0.7,1.0};
+        Vec3f color = {1.0,0.7,0.5};
         if(closestHit != nullptr && closestHit->didHit) color = mixLight(closestHit);
         else{
             // sky color
@@ -178,11 +178,37 @@ Vec3f World::mixLight(struct intersectionInfo* info){
     // Vec3f color = lightList[0]->lightValue(V, P, N, object);
     Vec3f color = {0,0,0};
     for(auto light : lightList){
-        Vec3f incomingColor = light->lightValue(info);
-        color = addLight(color, incomingColor);
+
+        // calculate if ray between object and light is blocked by an object
+        bool inShadow = false;
+        for(auto object : objectList){
+            // ensure we are not making any hit comparisson with the object to render, as it wiould have a hit.
+            if(object != info->object && !light->isAmbient){
+                // todo da kann einiges an code aus dem for loop raus aus performance gründen, aber shmeißt mir dann einen bad access fehler und niemand weiß woher...
+                Source* source = dynamic_cast<Source*>(light); // Light class muss in Source class umgewandelt werden, weil nur source eine getPosition funktion hat
+                Vec4f dir = source->getPosition() - info->position;
+                float dist = sqrt(scalarProduct(dir, dir));
+                cv::normalize(dir, dir);
+                intersectionInfo* hit = object->intersection(info->position, dir, this);
+                if(hit->didHit && hit->t < dist && hit->t > 0) inShadow = true;
+                delete hit;
+
+            }
+        }
+
+        if(!inShadow){
+            Vec3f incomingColor = light->lightValue(info);
+            color = addLight(color, incomingColor);
+        }else{
+            // color = {1,0,0};
+        }
+        
         // color += incomingColor;
     }
     for(int i = 0; i < 3; i++) if(color[i] > 1) color[i] = 1;
+                //     color[0] = info->normal[0];
+                // color[1] = info->normal[1];
+                // color[2] = info->normal[2];
     
     return color;
 }
