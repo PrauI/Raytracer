@@ -122,6 +122,29 @@ void World::createImage(const string& filename){
     camera.capture(filename);
 }
 
+intersectionInfo* World::hit(Vec4f& start, Vec4f& dir, Object* startingObject){
+    intersectionInfo* closestHit = nullptr;
+    for(auto object : objectList){
+        if(object == startingObject) continue;
+        intersectionInfo* info = object->intersection(start, dir, this);
+        if(info->didHit) {
+            // überprüfe, ob dies der erste Treffer ist oder ob der aktuelle Treffer näher ist als der vorherige
+            if(closestHit == nullptr || info->t < closestHit->t){
+                delete closestHit;
+                closestHit = info;  
+                info = nullptr;    
+            }else{
+                delete info;
+                info = nullptr;
+            }
+        }else{
+            delete info;
+            info = nullptr;
+        } 
+    }
+    return closestHit; // be carefull. this could return a nullptr!!
+}
+
 void World::calcMatrix(){
     for(int x = 0; x < camera.matrix.cols + 1; x++){
     for(int y = 0; y < camera.matrix.rows + 1; y++){
@@ -130,37 +153,23 @@ void World::calcMatrix(){
         Vec4f d = S - camera.getObserver();
         cv::normalize(d,d);
 
-        struct intersectionInfo* closestHit = nullptr;
-        for(auto object : objectList){
-            // choosing the closest point of em all
-            struct intersectionInfo* info = object->intersection(S, d, this);    
-            if(info->didHit) {
-                // überprüfe, ob dies der erste Treffer ist oder ob der aktuelle Treffer näher ist als der vorherige
-                if(closestHit == nullptr || info->t < closestHit->t){
-                    delete closestHit;
-                    closestHit = info;  
-                    info = nullptr;    
-                }else{
-                    delete info;
-                    info = nullptr;
-                }
-            }else{
-                delete info;
-                info = nullptr;
-            }
-        }
+        struct intersectionInfo* closestHit = hit(S, d, nullptr); // nullptr weil wir die kamera sind
+
         Vec3f color = {1.0,0.7,0.5};
-        if(closestHit != nullptr && closestHit->didHit) color = mixLight(closestHit);
-        else{
-            // sky color
-            // todo irgendwie zerscheißsts die farben. unser himmel ist gelb...
-        }
+        if(closestHit != nullptr && closestHit->didHit) color = mixLight(closestHit, 0, closestHit->object->getIndex());
+        else color = skyColor(d);
         delete closestHit;
         closestHit = nullptr;
         camera.matrix.at<cv::Vec3b>(camera.matrix.rows - y,x) = map255(color);
     }
     }
     
+}
+
+Vec3f skyColor(Vec4f& d){
+    // float a = 0.5 * (d[0] + 1.0);
+    // return (1.0 - a) * Vec3f{1.0, 0.7, 0.5} + a * Vec3f{1.0, 1.0, 1.0};
+    return Vec3f{1.0, 0.7, 0.5};
 }
 
 // maped zahlen aus dem raum 0-1 auf 0-255
@@ -174,41 +183,50 @@ Vec3b map255(const Vec3f& color){
 
 // Calculates Color / Light at a certain intersection point 
 // based on all the lights in the scene
-Vec3f World::mixLight(struct intersectionInfo* info){
+Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce){
     // Vec3f color = lightList[0]->lightValue(V, P, N, object);
     Vec3f color = {0,0,0};
     for(auto light : lightList){
 
         // calculate if ray between object and light is blocked by an object
         bool inShadow = false;
-        for(auto object : objectList){
-            // ensure we are not making any hit comparisson with the object to render, as it wiould have a hit.
-            if(object != info->object && !light->isAmbient){
-                // todo da kann einiges an code aus dem for loop raus aus performance gründen, aber shmeißt mir dann einen bad access fehler und niemand weiß woher...
-                Source* source = dynamic_cast<Source*>(light); // Light class muss in Source class umgewandelt werden, weil nur source eine getPosition funktion hat
-                Vec4f dir = source->getPosition() - info->position;
-                float dist = sqrt(scalarProduct(dir, dir));
-                cv::normalize(dir, dir);
-                intersectionInfo* hit = object->intersection(info->position, dir, this);
-                if(hit->didHit && hit->t < dist && hit->t > 0) inShadow = true;
-                delete hit;
+        if(!light->isAmbient){
 
-            }
+            Source* source = dynamic_cast<Source*>(light); // Light class muss in Source class umgewandelt werden, weil nur source eine getPosition funktion hat
+            Vec4f dir = source->getPosition() - info->position;
+            float dist = sqrt(scalarProduct(dir, dir));
+            cv::normalize(dir, dir);
+            intersectionInfo* shadowHit = hit(info->position, dir, info->object);
+            if(shadowHit != nullptr && shadowHit->didHit && shadowHit->t < dist && shadowHit->t > 0) inShadow = true;
+            delete shadowHit;
         }
 
         if(!inShadow){
             Vec3f incomingColor = light->lightValue(info);
             color = addLight(color, incomingColor);
-        }else{
-            // color = {1,0,0};
+        }
+        if(light->isAmbient){
+            Vec3f incomingColor = light->lightValue(info);
+            color = addLight(color, incomingColor);
+        }
+        // calculating the reflected light
+        if(currentBounce < maxBounce){
+            Vec4f R = info->dir - 2*(scalarProduct(info->dir, info->normal)) * info->normal;
+            cv::normalize(R,R);
+            R = R * -1;
+            intersectionInfo* reflectedHit = hit(info->position, R, info->object);
+            Vec3f rcolor;
+            if(reflectedHit != nullptr && reflectedHit->didHit && reflectedHit->t > 0){
+                rcolor = mixLight(reflectedHit, currentBounce + 1, maxBounce);
+                Vec3f Kr = info->object->getReflected();
+                float scalar = scalarProduct(R, info->normal);
+                for(int i = 0; i < 3; i++){ rcolor[i] = rcolor[i] * Kr[i] * scalar; }
+            }else rcolor = {0,0,0};
+            color = addLight(color, rcolor);
         }
         
-        // color += incomingColor;
     }
     for(int i = 0; i < 3; i++) if(color[i] > 1) color[i] = 1;
-                //     color[0] = info->normal[0];
-                // color[1] = info->normal[1];
-                // color[2] = info->normal[2];
     
     return color;
 }

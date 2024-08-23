@@ -65,6 +65,16 @@ Sphere::Sphere(Json::Value& input, Mat& matrix){
         // todo defaultColor
     }
 
+    // set Index
+    try{
+        if(!input.isMember("index")) throw std::runtime_error("No Index provided for Sphere");
+        Json::Value Jindex = input["index"];
+        setIndex(Jindex);
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+        cout << "Proceeding with Index: 1" << endl;
+    }
+
     transformationMatrix = matrix;
 }
 Vec4f Object::getPosition(){ return position;}
@@ -72,6 +82,9 @@ Vec3f Object::getAmbient(){ return ambient;}
 Vec3f Object::getDiffuse(){ return diffuse;}
 float Object::getShininess() {return shininess;}
 Vec3f Object::getSpecular(){ return specular;}
+Vec3f Object::getReflected(){ return reflected; }
+Vec3f Object::getRefracted(){ return refracted; }
+int Object::getIndex(){ return index; }
 
 void Object::setColor(Json::Value& color){
     // todo try catch
@@ -84,6 +97,16 @@ void Object::setColor(Json::Value& color){
         refracted[i] = color["refracted"][i].asInt();
     }
     shininess = color["shininess"].asFloat();
+}
+
+void Object::setIndex(Json::Value& Jindex){
+    try{
+        index = Jindex.asInt();
+    }catch(const std::exception& e){
+        cout << e.what() << endl;
+        index = 1;
+        cout << "Proceeding with Index: 1" << endl;
+    }
 }
 
 struct intersectionInfo* Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
@@ -181,6 +204,16 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
         std::cerr << e.what() << endl;
         cout << "Proceeding with default colors" << endl;
         // todo defaultColor
+    }
+
+     // set Index
+    try{
+        if(!input.isMember("index")) throw std::runtime_error("No Index provided for Halfspace");
+        Json::Value Jindex = input["index"];
+        setIndex(Jindex);
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+        cout << "Proceeding with Index: 1" << endl;
     }
 
     transformationMatrix = matrix;

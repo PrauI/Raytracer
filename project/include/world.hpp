@@ -26,10 +26,12 @@ public:
     void readObjects(Json::Value& objects);
     void setupObjects(Json::Value& object, Mat& matrix);
     void calcMatrix();
-    Vec3f mixLight(struct intersectionInfo* info);
+    intersectionInfo* hit(Vec4f& start, Vec4f& dir, Object* startingObject);
+    Vec3f mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce);
 };
 
 Vec3b map255(const Vec3f& color);
 Vec3f addLight(Vec3f& color1, Vec3f& color2);
+Vec3f skyColor(Vec4f& d);
 
 #endif // WORLD_HPP

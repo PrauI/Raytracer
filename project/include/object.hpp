@@ -32,6 +32,7 @@ private:
     Vec3f reflected;
     Vec3f refracted;
     float shininess;
+    int index;
 
 
 public:
@@ -39,11 +40,15 @@ public:
     void setPosition(Json::Value& input);
     void setDefaultPosition();
     void setColor(Json::Value& color);
+    void setIndex(Json::Value& Jindex);
     Vec4f getPosition();
     Vec3f getAmbient();
     Vec3f getDiffuse();
     Vec3f getSpecular();
+    Vec3f getReflected();
+    Vec3f getRefracted();
     float getShininess();
+    int getIndex();
     virtual struct intersectionInfo* intersection(const Vec4f& S, const Vec4f& d, World* scene) = 0;
 };
 

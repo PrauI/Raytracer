@@ -71,16 +71,13 @@ Vec3f Source::lightValue(struct intersectionInfo* info){
     cv::normalize(info->dir, info->dir);
     float scalar2 = scalarProduct(R, -info->dir);
     if(scalar2 < 0) scalar2 = 0;
- 
-     for(int i = 0; i < 3; i++){
-        Ed[i] = Kd[i] * intensity[i] * pow(scalar, info->object->getShininess());
-        Es[i] = Ks[i] * intensity[i] * pow(scalar2, info->object->getShininess());
 
+     for(int i = 0; i < 3; i++){
+        Ed[i] = Kd[i] * intensity[i] * scalar;
+        Es[i] = Ks[i] * intensity[i] * pow(scalar2, info->object->getShininess());
     }
 
-
-    return addLight(Es, Ed);
-
+    return addLight(Ed, Es);
 }
 
 Vec4f Source::getPosition(){ return position; }
