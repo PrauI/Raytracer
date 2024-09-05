@@ -49,7 +49,7 @@ public:
     Vec3f getRefracted();
     float getShininess();
     int getIndex();
-    virtual struct intersectionInfo* intersection(const struct Ray& ray, World* scene) = 0;
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) = 0;
 };
 
 class Sphere: public Object{
@@ -59,7 +59,7 @@ private:
 public:
     Sphere(Json::Value& input, Mat& matrix);
 
-    struct intersectionInfo* intersection(const struct Ray& ray, World* scene);
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
 };
 
 class Halfspace: public Object{
@@ -68,7 +68,7 @@ private:
 
 public:
     Halfspace(Json::Value& input, Mat& matrix);
-    struct intersectionInfo* intersection(const struct Ray& ray, World* scene);
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
     void setNormal(Json::Value& input);
     void setDefaultNormal();
 };

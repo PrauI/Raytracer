@@ -110,16 +110,12 @@ void Object::setIndex(Json::Value& Jindex){
     }
 }
 
-struct intersectionInfo* Sphere::intersection(const struct Ray& ray, World* scene){
-    intersectionInfo* result = new intersectionInfo;
-    result->didHit = false;
-    result->object = this;
+void Sphere::intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit){
 
     Vec4f C = getPosition();
     Mat resultD = transformationMatrix.inv() * ray.dir;
     Vec4f dm = resultD;
     cv::normalize(dm, dm);
-    result->dir = -dm;
     // dm = dm * -1;
     Mat resultS = transformationMatrix.inv() * ray.position;
     Vec4f Sm = resultS;
@@ -132,21 +128,24 @@ struct intersectionInfo* Sphere::intersection(const struct Ray& ray, World* scen
     float discriminant = b * b - 4 * a * c;
 
     // no solution when d < 0 (ray misses sphere)
-    if(discriminant < 0) return result;
-    // else:
-    result->didHit = true;
+    if(discriminant < 0) return;
+    // else it hit
 
     float t = (-b - sqrt(discriminant)) / (2 * a);
-    result->t = t;
+    if(t >= closesHit->t) return;
+    closesHit->t = t;
+    closesHit->didHit = true;
+    closesHit->object = this;
+    closesHit->dir = -dm;
 
     Vec4f intersectionPoint = Sm + dm * t;
-    result->position = intersectionPoint;
+    closesHit->position = intersectionPoint;
     Vec4f normal = intersectionPoint - C;
     cv::normalize(normal, normal);
-    result->normal = normal;
+    closesHit->normal = normal;
 
     // cout << "intersection: " << value << endl;
-    return result;
+    return;
 
 }
 
@@ -220,35 +219,32 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
     transformationMatrix = matrix;
 }
 
-struct intersectionInfo* Halfspace::intersection(const struct Ray& ray, World* scene){
-    struct intersectionInfo* result = new intersectionInfo;
-    result->didHit = false;
-    result->object = this;
+void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit){
 
     Mat resultD = transformationMatrix.inv() * ray.dir;
     Vec4f dm = resultD;
     cv::normalize(dm, dm);
-    result->dir = -dm;
     Mat resultS = transformationMatrix.inv() * ray.position;
     Vec4f Sm = resultS;
  
    // since a halfspace is an infinite plane the there is either an intersection point or the ray coming from the camera is parallel to the plane
    float scalarValue = scalarProduct(this->normal, dm);
    // cout << "normal: " << normal << " d: " << dm << " scalar: " << scalarValue << endl;
-   if(scalarValue > -0.0001) return result; // they are parallel and there is no intersection
+   if(scalarValue > -0.0001) return; // they are parallel and there is no intersection
    Vec4f pos = getPosition();
 
    float t = scalarProduct(pos - Sm, normal) / scalarValue;
-    if(t < 0) return result; // intersection Point behind camera
-    if(t > 80) return result; // todo maybe change or delete
+    if(t < 0) return; // intersection Point behind camera
+    if(t > 80) return; // todo maybe change or delete
 
-    result->t = t;
-    result->didHit = true;
+    closesHit->t = t;
+    closesHit->dir = -dm;
+    closesHit->didHit = true;
 
     Vec4f intersectionPoint = Sm + t * dm;
-    result->position = intersectionPoint;
+    closesHit->position = intersectionPoint;
+    closesHit->object = this;
+    closesHit->normal = normal;
 
-    result->normal = normal;
-
-    return result;    
+    return;    
 }

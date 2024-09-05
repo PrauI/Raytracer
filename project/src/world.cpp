@@ -6,6 +6,8 @@
 #include <json/json.h>
 #include <fstream>
 #include <opencv2/opencv.hpp>
+#include <limits>
+#define INFINITY std::numeric_limits<float>::infinity()
 
 using std::cout, std::endl, cv::Mat;
 using std::string;
@@ -123,47 +125,30 @@ void World::createImage(const string& filename){
     camera.capture(filename);
 }
 
-intersectionInfo* World::traceRay(struct Ray& ray, Object* startingObject){
-    intersectionInfo* closesttraceRay = nullptr;
+void World::hit(struct Ray& ray, Object* startingObject, intersectionInfo* closestHit){
     for(auto object : objectList){
         if(object == startingObject) continue; 
-        intersectionInfo* info = object->intersection(ray, this);
-        if(info->didtraceRay) {
-            // überprüfe, ob dies der erste Treffer ist oder ob der aktuelle Treffer näher ist als der vorherige
-            if(closesttraceRay == nullptr || info->t < closesttraceRay->t){
-                delete closesttraceRay;
-                closesttraceRay = info;  
-                info = nullptr;    
-            }else{
-                delete info;
-                info = nullptr;
-            }
-        }else{
-            delete info;
-            info = nullptr;
-        } 
+        object->intersection(ray, this, closestHit); 
     }
-    return closesttraceRay; // be carefull. this could return a nullptr!!
+    return; // be carefull. this could return a nullptr!!
 }
 
 void World::calcMatrix(){
+    struct intersectionInfo closestHit; // changing to stack memory
     for(int x = 0; x < camera.matrix.cols + 1; x++){
     for(int y = 0; y < camera.matrix.rows + 1; y++){
-        // for every pixel
-
+        closestHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
         Vec4f delta {float(y) / camera.getDpi(), float(x) / camera.getDpi(),0,0};
         Vec4f S = camera.getPosition() + delta;
         Vec4f d = S - camera.getObserver();
         cv::normalize(d,d);
-        Ray ray = Ray{.dir = d, .position = S};
+        Ray ray = Ray{.dir = std::move(d), .position = std::move(S)};
 
-        struct intersectionInfo* closesttraceRay = traceRay(ray, nullptr); // nullptr weil wir die kamera sind
+        hit(ray, nullptr, &closestHit); // nullptr weil wir die kamera sind
 
         Vec3f color = {1.0,0.7,0.5};
-        if(closesttraceRay != nullptr && closesttraceRay->didtraceRay) color = mixLight(closesttraceRay, 0, closesttraceRay->object->getIndex());
-        else color = skyColor(d);
-        delete closesttraceRay;
-        closesttraceRay = nullptr;
+        if(closestHit.didHit) color = mixLight(&closestHit, 0, closestHit.object->getIndex());
+        else color = skyColor(ray.dir);
         camera.matrix.at<cv::Vec3b>(camera.matrix.rows - y,x) = map255(color);
     }
     }
@@ -201,9 +186,9 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             float dist = sqrt(scalarProduct(dir, dir));
             cv::normalize(dir, dir);
             struct Ray lightRay = {.dir = dir, .position = info->position};
-            intersectionInfo* shadowtraceRay = traceRay(lightRay, info->object);
-            if(shadowtraceRay != nullptr && shadowtraceRay->didtraceRay && shadowtraceRay->t < dist && shadowtraceRay->t > 0) inShadow = true;
-            delete shadowtraceRay;
+            intersectionInfo shadowHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+            hit(lightRay, info->object, &shadowHit);
+            if(shadowHit.didHit && shadowHit.t < dist && shadowHit.t > 0) inShadow = true;
         }
 
         if(!inShadow){
@@ -222,10 +207,11 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             cv::normalize(R,R);
             R = R * -1;
             struct Ray reflectedRay = {.dir = R, .position = info->position};
-            intersectionInfo* reflectedtraceRay = traceRay(reflectedRay, info->object);
+            intersectionInfo reflectedHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+            hit(reflectedRay, info->object, &reflectedHit);
             Vec3f rcolor;
-            if(reflectedtraceRay != nullptr && reflectedtraceRay->didtraceRay && reflectedtraceRay->t > 0){
-                rcolor = mixLight(reflectedtraceRay, currentBounce + 1, maxBounce);
+            if(reflectedHit.didHit && reflectedHit.t > 0){
+                rcolor = mixLight(&reflectedHit, currentBounce + 1, maxBounce);
                 Vec3f Kr = info->object->getReflected();
                 float scalar = scalarProduct(R, info->normal);
                 for(int i = 0; i < 3; i++){ rcolor[i] = rcolor[i] * Kr[i] * scalar; }
@@ -236,10 +222,10 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             // float scalar = scalarProduct(info->dir, info->normal);
             // // Vec4f T = 1.0 / 1.5168 * (info->dir - (scalar + sqrt(pow(1.0/1.5169, 2) + pow(scalar, 2) - 1) * info->normal));
             // cv::normalize(T, T);
-            // intersectionInfo* refractedtraceRay = traceRay(info->position, T, info->object); // evtl. nullptr
+            // intersectionInfo* refractedHit = hit(info->position, T, info->object); // evtl. nullptr
             // Vec3f tcolor;
-            // if(refractedtraceRay != nullptr && refractedtraceRay->didtraceRay && refractedtraceRay->t > 0){
-            //     tcolor = mixLight(refractedtraceRay, currentBounce + 1, maxBounce);
+            // if(refractedHit != nullptr && refractedHit->didHit && refractedHit->t > 0){
+            //     tcolor = mixLight(refractedHit, currentBounce + 1, maxBounce);
             //     Vec3f Kt = info->object->getRefracted();
             //     for(int i = 0; i < 3; i++){ tcolor[i] = tcolor[i] * Kt[i]; }
             // }else tcolor = {0,0,0};
