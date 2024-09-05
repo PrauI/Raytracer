@@ -6,3 +6,5 @@
 - [ ] Reflected und refracted light
 - [ ] translation & rotation 
 - [ ] in main.cpp calcMatrix und createImage zusammenfassen 
+- [ ] documentation mit doxywizard (slide week 09a)
+- [ ] description with @param, @description, ... week 09

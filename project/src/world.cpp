@@ -211,6 +211,8 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
         }
         // calculating the reflected light
         if(currentBounce < maxBounce){
+
+            // reflected
             Vec4f R = info->dir - 2*(scalarProduct(info->dir, info->normal)) * info->normal;
             cv::normalize(R,R);
             R = R * -1;
@@ -223,6 +225,19 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
                 for(int i = 0; i < 3; i++){ rcolor[i] = rcolor[i] * Kr[i] * scalar; }
             }else rcolor = {0,0,0};
             color = addLight(color, rcolor);
+
+            // refracted
+            // float scalar = scalarProduct(info->dir, info->normal);
+            // // Vec4f T = 1.0 / 1.5168 * (info->dir - (scalar + sqrt(pow(1.0/1.5169, 2) + pow(scalar, 2) - 1) * info->normal));
+            // cv::normalize(T, T);
+            // intersectionInfo* refractedHit = hit(info->position, T, info->object); // evtl. nullptr
+            // Vec3f tcolor;
+            // if(refractedHit != nullptr && refractedHit->didHit && refractedHit->t > 0){
+            //     tcolor = mixLight(refractedHit, currentBounce + 1, maxBounce);
+            //     Vec3f Kt = info->object->getRefracted();
+            //     for(int i = 0; i < 3; i++){ tcolor[i] = tcolor[i] * Kt[i]; }
+            // }else tcolor = {0,0,0};
+            // color = addLight(color, tcolor);
         }
         
     }

@@ -1,6 +1,6 @@
 {
     "screen": {
-        "dpi": 300,
+        "dpi": 200,
         "dimensions": [2, 4],
         "position": [-1, -2, -10],
         "observer": [0, 0, -15]
@@ -62,7 +62,7 @@
                                     "refracted": [1, 1, 1],
                                     "shininess": 1
                                     },
-                                "index": 3
+                                "index": 1
                                 }
                     }
                 }
@@ -86,7 +86,7 @@
                                     "refracted": [1, 1, 0],
                                     "shininess": 1
                                     },
-                                "index": 3
+                                "index": 1
                                 }
                     }
                 }
