@@ -1,5 +1,6 @@
 #include "object.hpp"
 #include "world.hpp"
+#include "ray.hpp"
 #include <json/json.h>
 #include <iostream>
 #include <cmath>
@@ -109,18 +110,18 @@ void Object::setIndex(Json::Value& Jindex){
     }
 }
 
-struct intersectionInfo* Sphere::intersection(const Vec4f& S, const Vec4f& d, World* scene){
+struct intersectionInfo* Sphere::intersection(const struct Ray& ray, World* scene){
     intersectionInfo* result = new intersectionInfo;
     result->didHit = false;
     result->object = this;
 
     Vec4f C = getPosition();
-    Mat resultD = transformationMatrix.inv() * d;
+    Mat resultD = transformationMatrix.inv() * ray.dir;
     Vec4f dm = resultD;
     cv::normalize(dm, dm);
     result->dir = -dm;
     // dm = dm * -1;
-    Mat resultS = transformationMatrix.inv() * S;
+    Mat resultS = transformationMatrix.inv() * ray.position;
     Vec4f Sm = resultS;
 
     Vec4f offsetRayOrigin = Sm - C;
@@ -219,16 +220,16 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
     transformationMatrix = matrix;
 }
 
-struct intersectionInfo* Halfspace::intersection(const Vec4f& S, const Vec4f& d, World* scene){
+struct intersectionInfo* Halfspace::intersection(const struct Ray& ray, World* scene){
     struct intersectionInfo* result = new intersectionInfo;
     result->didHit = false;
     result->object = this;
 
-    Mat resultD = transformationMatrix.inv() * d;
+    Mat resultD = transformationMatrix.inv() * ray.dir;
     Vec4f dm = resultD;
     cv::normalize(dm, dm);
     result->dir = -dm;
-    Mat resultS = transformationMatrix.inv() * S;
+    Mat resultS = transformationMatrix.inv() * ray.position;
     Vec4f Sm = resultS;
  
    // since a halfspace is an infinite plane the there is either an intersection point or the ray coming from the camera is parallel to the plane

@@ -26,7 +26,7 @@ public:
     void readObjects(Json::Value& objects);
     void setupObjects(Json::Value& object, Mat& matrix);
     void calcMatrix();
-    intersectionInfo* hit(Vec4f& start, Vec4f& dir, Object* startingObject);
+    intersectionInfo* hit(struct Ray& ray, Object* startingObject);
     Vec3f mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce);
 };
 

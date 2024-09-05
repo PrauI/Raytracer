@@ -1,6 +1,7 @@
 #include "world.hpp"
 #include "object.hpp"
 #include "light.hpp"
+#include "ray.hpp"
 #include <iostream>
 #include <json/json.h>
 #include <fstream>
@@ -122,11 +123,11 @@ void World::createImage(const string& filename){
     camera.capture(filename);
 }
 
-intersectionInfo* World::hit(Vec4f& start, Vec4f& dir, Object* startingObject){
+intersectionInfo* World::hit(struct Ray& ray, Object* startingObject){
     intersectionInfo* closestHit = nullptr;
     for(auto object : objectList){
-        if(object == startingObject) continue;
-        intersectionInfo* info = object->intersection(start, dir, this);
+        if(object == startingObject) continue; 
+        intersectionInfo* info = object->intersection(ray, this);
         if(info->didHit) {
             // überprüfe, ob dies der erste Treffer ist oder ob der aktuelle Treffer näher ist als der vorherige
             if(closestHit == nullptr || info->t < closestHit->t){
@@ -152,8 +153,9 @@ void World::calcMatrix(){
         Vec4f S = camera.getPosition() + delta;
         Vec4f d = S - camera.getObserver();
         cv::normalize(d,d);
+        Ray ray = Ray{.dir = d, .position = S};
 
-        struct intersectionInfo* closestHit = hit(S, d, nullptr); // nullptr weil wir die kamera sind
+        struct intersectionInfo* closestHit = hit(ray, nullptr); // nullptr weil wir die kamera sind
 
         Vec3f color = {1.0,0.7,0.5};
         if(closestHit != nullptr && closestHit->didHit) color = mixLight(closestHit, 0, closestHit->object->getIndex());
@@ -196,7 +198,8 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             Vec4f dir = source->getPosition() - info->position;
             float dist = sqrt(scalarProduct(dir, dir));
             cv::normalize(dir, dir);
-            intersectionInfo* shadowHit = hit(info->position, dir, info->object);
+            struct Ray lightRay = {.dir = dir, .position = info->position};
+            intersectionInfo* shadowHit = hit(lightRay, info->object);
             if(shadowHit != nullptr && shadowHit->didHit && shadowHit->t < dist && shadowHit->t > 0) inShadow = true;
             delete shadowHit;
         }
@@ -216,7 +219,8 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             Vec4f R = info->dir - 2*(scalarProduct(info->dir, info->normal)) * info->normal;
             cv::normalize(R,R);
             R = R * -1;
-            intersectionInfo* reflectedHit = hit(info->position, R, info->object);
+            struct Ray reflectedRay = {.dir = R, .position = info->position};
+            intersectionInfo* reflectedHit = hit(reflectedRay, info->object);
             Vec3f rcolor;
             if(reflectedHit != nullptr && reflectedHit->didHit && reflectedHit->t > 0){
                 rcolor = mixLight(reflectedHit, currentBounce + 1, maxBounce);
