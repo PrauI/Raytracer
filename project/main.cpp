@@ -2,9 +2,12 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <chrono>
+#include <thread>
 
 #include "camera.hpp"
 #include "world.hpp"
+
+#define NUM_THREADS std::thread::hardware_concurrency()
 
 using cv::Vec4f, cv::Vec3f;
 
@@ -26,7 +29,22 @@ int main() {
     std::cout << "Reading file: " << readingtime.count() << " seconds" << std::endl;
      // calcMatrix berchnet das Bild und speichert die Daten in einer Matrix
     auto startCalc = std::chrono::high_resolution_clock::now();
-    world.calcMatrix();
+    // start Multithreading
+    std::vector<std::thread> threads;
+
+    int blockSizeY = (world.camera.matrix.rows + 1) / NUM_THREADS;
+
+    for(int j = 0; j < NUM_THREADS; j++){
+        int startY = j * blockSizeY;
+        int endY = (j + 1) * blockSizeY;
+
+        threads.emplace_back([=, &world]() { world.calcMatrix(startY, endY); });
+    }
+    
+    for(auto& thread : threads){
+        thread.join();
+    }
+
     auto endCalc = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> calculationTime = endCalc - startCalc;
     std::cout << "Calculate Matrix: " << calculationTime.count() << " seconds" << std::endl;

@@ -62,7 +62,7 @@
                                     "refracted": [1, 1, 1],
                                     "shininess": 1
                                     },
-                                "index": 1
+                                "index": 2
                                 }
                     }
                 }
@@ -86,7 +86,7 @@
                                     "refracted": [1, 1, 0],
                                     "shininess": 1
                                     },
-                                "index": 1
+                                "index": 2
                                 }
                     }
                 }

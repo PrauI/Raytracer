@@ -16,16 +16,16 @@ class Light;
 struct intersectionInfo;
 
 class World {
-    Camera camera;
     std::vector<Light*> lightList;
     std::vector<Object*> objectList;
 public:
+    Camera camera;
     World();
     void readFile(const string& filename);
     void createImage(const string& filename);
     void readObjects(Json::Value& objects);
     void setupObjects(Json::Value& object, Mat& matrix);
-    void calcMatrix();
+    void calcMatrix(int startY, int endY);
     void hit(struct Ray& ray, Object* startingObject, intersectionInfo* closestHit);
     Vec3f mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce);
 };
