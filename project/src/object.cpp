@@ -157,6 +157,8 @@ float scalarProduct(const Vec4f& a, const Vec4f& b){
     return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
 }
 
+
+
 void Halfspace::setNormal(Json::Value& input){
     // we already checked if input is in the right format beore calling the function
     for(int i = 0; i < 3; i++){
@@ -167,8 +169,7 @@ void Halfspace::setNormal(Json::Value& input){
 }
 
 void Halfspace::setDefaultNormal(){
-    for(int i = 0; i < 3; i++) normal[i] = 0;
-    normal[0] = 1;
+    normal = Vec4f(0.0);
 }
 
 Halfspace::Halfspace(Json::Value& input, Mat& matrix){

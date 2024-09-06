@@ -7,7 +7,9 @@
 #include "camera.hpp"
 #include "world.hpp"
 
-#define NUM_THREADS std::thread::hardware_concurrency()
+// #define NUM_THREADS std::thread::hardware_concurrency()
+
+#define NUM_THREADS 4
 
 using cv::Vec4f, cv::Vec3f;
 
@@ -30,21 +32,30 @@ int main() {
      // calcMatrix berchnet das Bild und speichert die Daten in einer Matrix
     auto startCalc = std::chrono::high_resolution_clock::now();
     // start Multithreading
-    std::vector<std::thread> threads;
 
-    int blockSizeY = (world.camera.matrix.rows + 1) / NUM_THREADS;
+    std::cout << "Threads used: " << NUM_THREADS << std::endl;
 
-    for(int j = 0; j < NUM_THREADS; j++){
-        int startY = j * blockSizeY;
-        int endY = (j + 1) * blockSizeY;
+    if(NUM_THREADS > 1){
+        std::vector<std::thread> threads;
 
-        threads.emplace_back([=, &world]() { world.calcMatrix(startY, endY); });
+        int blockSizeX = (world.camera.matrix.cols + 1) / NUM_THREADS;
+
+        for(int j = 0; j < NUM_THREADS; j++){
+            int startX = j * blockSizeX;
+            int endX = (j + 1) * blockSizeX;
+
+            threads.emplace_back([=, &world]() { world.calcMatrix(startX, endX); });
+        }
+        
+        for(auto& thread : threads){
+            thread.join();
+        }
+
+    }else{
+        int blockSize = world.camera.matrix.cols + 1;
+        world.calcMatrix(0, blockSize);
     }
     
-    for(auto& thread : threads){
-        thread.join();
-    }
-
     auto endCalc = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> calculationTime = endCalc - startCalc;
     std::cout << "Calculate Matrix: " << calculationTime.count() << " seconds" << std::endl;

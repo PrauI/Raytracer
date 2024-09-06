@@ -132,10 +132,10 @@ void World::hit(struct Ray& ray, Object* startingObject, intersectionInfo* close
     }
 }
 
-void World::calcMatrix(int startY, int endY){
+void World::calcMatrix(int startX, int endX){
     struct intersectionInfo closestHit; // changing to stack memory
-    for(int x = 0; x < camera.matrix.cols + 1; x++){
-    for(int y = startY; y < endY + 1; y++){
+    for(int y = 0; y < camera.matrix.rows + 1; y++){
+    for(int x = startX; x < endX + 1; x++){
         closestHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
         Vec4f delta {float(y) / camera.getDpi(), float(x) / camera.getDpi(),0,0};
         Vec4f S = camera.getPosition() + delta;
