@@ -8,8 +8,9 @@
 #include "world.hpp"
 
 // #define NUM_THREADS std::thread::hardware_concurrency()
-
+#ifndef NUM_THREADS
 #define NUM_THREADS 4
+#endif
 
 using cv::Vec4f, cv::Vec3f;
 

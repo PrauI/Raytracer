@@ -76,7 +76,7 @@ Sphere::Sphere(Json::Value& input, Mat& matrix){
         cout << "Proceeding with Index: 1" << endl;
     }
 
-    transformationMatrix = matrix;
+    transformationMatrix = matrix.inv();
 }
 Vec4f Object::getPosition(){ return position;}
 Vec3f Object::getAmbient(){ return ambient;}
@@ -111,27 +111,30 @@ void Object::setIndex(Json::Value& Jindex){
 }
 
 void Sphere::intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit){
-
-    Vec4f C = getPosition();
-    Mat resultD = transformationMatrix.inv() * ray.dir;
+    Mat resultD = transformationMatrix * ray.dir;
     Vec4f dm = resultD;
     cv::normalize(dm, dm);
     // dm = dm * -1;
-    Mat resultS = transformationMatrix.inv() * ray.position;
+
+    Mat resultS = transformationMatrix * ray.position;
     Vec4f Sm = resultS;
-
+    Vec4f C = getPosition();
     Vec4f offsetRayOrigin = Sm - C;
-    float a = scalarProduct(dm, dm);
-    float b = 2 * scalarProduct(offsetRayOrigin, dm);
-    float c = scalarProduct(offsetRayOrigin, offsetRayOrigin) - radius * radius;
 
-    float discriminant = b * b - 4 * a * c;
+    float dm_dm = scalarProduct(dm, dm);
+    float offset_dm = scalarProduct(offsetRayOrigin, dm);
+    float offset_offset = scalarProduct(offsetRayOrigin, offsetRayOrigin);
+
+    float b = 2 * offset_dm;
+
+    float discriminant = b*b - 4*dm_dm*(offset_offset - radius*radius);
 
     // no solution when d < 0 (ray misses sphere)
     if(discriminant < 0) return;
     // else it hit
 
-    float t = (-b - sqrt(discriminant)) / (2 * a);
+    float sqrtDiscriminant = sqrt(discriminant);
+    float t = (-b - sqrtDiscriminant) / (2 * dm_dm);
     if(t >= closesHit->t) return;
     closesHit->t = t;
     closesHit->didHit = true;
