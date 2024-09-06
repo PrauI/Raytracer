@@ -134,12 +134,16 @@ void World::hit(struct Ray& ray, Object* startingObject, intersectionInfo* close
 
 void World::calcMatrix(int startX, int endX){
     struct intersectionInfo closestHit; // changing to stack memory
-    for(int y = 0; y < camera.matrix.rows + 1; y++){
+    float dpi = camera.getDpi();
+    Vec4f cameraPosition = camera.getPosition();
+    Vec4f cameraObserver = camera.getObserver();
+    int rows = camera.matrix.rows;
+    for(int y = 0; y < rows + 1; y++){
     for(int x = startX; x < endX + 1; x++){
         closestHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
-        Vec4f delta {float(y) / camera.getDpi(), float(x) / camera.getDpi(),0,0};
-        Vec4f S = camera.getPosition() + delta;
-        Vec4f d = S - camera.getObserver();
+        Vec4f delta {float(y) / dpi, float(x) / dpi,0,0};
+        Vec4f S = cameraPosition + delta;
+        Vec4f d = S - cameraObserver;
         cv::normalize(d,d);
         Ray ray = Ray{.dir = std::move(d), .position = std::move(S)};
 
@@ -147,11 +151,10 @@ void World::calcMatrix(int startX, int endX){
 
         Vec3f color = {1.0,0.7,0.5};
         if(closestHit.didHit) color = mixLight(&closestHit, 0, closestHit.object->getIndex());
-        else color = skyColor(ray.dir);
-        camera.matrix.at<cv::Vec3b>(camera.matrix.rows - y,x) = map255(color);
+        // else color = skyColor(ray.dir);
+        camera.matrix.at<cv::Vec3b>(rows - y,x) = map255(color);
     }
     }
-    
 }
 
 Vec3f skyColor(Vec4f& d){
