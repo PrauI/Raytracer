@@ -25,7 +25,8 @@ public:
     void createImage(const string& filename);
     void readObjects(Json::Value& objects);
     void setupObjects(Json::Value& object, Mat& matrix);
-    void calcMatrix(int startY, int endY);
+    void calcMatrix(int startRow, int endRow, int startCol, int endCol);
+    void processMatrix(int numThreads);
     void hit(struct Ray& ray, Object* startingObject, intersectionInfo* closestHit);
     Vec3f mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce);
 };

@@ -37,24 +37,12 @@ int main() {
     std::cout << "Threads used: " << NUM_THREADS << std::endl;
 
     if(NUM_THREADS > 1){
-        std::vector<std::thread> threads;
 
-        int blockSizeX = (world.camera.matrix.cols + 1) / NUM_THREADS;
-
-        for(int j = 0; j < NUM_THREADS; j++){
-            int startX = j * blockSizeX;
-            int endX = (j + 1) * blockSizeX;
-
-            threads.emplace_back([=, &world]() { world.calcMatrix(startX, endX); });
-        }
-        
-        for(auto& thread : threads){
-            thread.join();
-        }
+        world.processMatrix(NUM_THREADS);
 
     }else{
         int blockSize = world.camera.matrix.cols + 1;
-        world.calcMatrix(0, blockSize);
+        world.calcMatrix(0, world.camera.matrix.rows, 0, world.camera.matrix.cols);
     }
     
     auto endCalc = std::chrono::high_resolution_clock::now();

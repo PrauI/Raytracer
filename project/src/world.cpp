@@ -7,6 +7,7 @@
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include <limits>
+#include <thread>
 #define INFINITY std::numeric_limits<float>::infinity()
 
 using std::cout, std::endl, cv::Mat;
@@ -132,14 +133,33 @@ void World::hit(struct Ray& ray, Object* startingObject, intersectionInfo* close
     }
 }
 
-void World::calcMatrix(int startX, int endX){
+void World::processMatrix(int numThreads) {
+    int rows = camera.matrix.rows;
+    int cols = camera.matrix.cols;
+    int blockSize = rows / numThreads;
+
+    std::vector<std::thread> threads;
+
+    for(int i = 0; i < numThreads; ++i) {
+        int startRow = i * blockSize;
+        int endRow = (i == numThreads - 1) ? rows : (i + 1) * blockSize;
+        threads.emplace_back([this, startRow, endRow, cols]() {
+            this->calcMatrix(startRow, endRow, 0, cols);
+        });
+    }
+
+    for(auto& thread : threads) {
+        thread.join();
+    }
+}
+
+void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
     struct intersectionInfo closestHit; // changing to stack memory
     float dpi = camera.getDpi();
     Vec4f cameraPosition = camera.getPosition();
     Vec4f cameraObserver = camera.getObserver();
-    int rows = camera.matrix.rows;
-    for(int y = 0; y < rows + 1; y++){
-    for(int x = startX; x < endX + 1; x++){
+    for(int y = startRow; y < endRow; ++y){
+    for(int x = startCol; x < endCol; ++x){
         closestHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
         Vec4f delta {float(y) / dpi, float(x) / dpi,0,0};
         Vec4f S = cameraPosition + delta;
@@ -152,7 +172,7 @@ void World::calcMatrix(int startX, int endX){
         Vec3f color = {1.0,0.7,0.5};
         if(closestHit.didHit) color = mixLight(&closestHit, 0, closestHit.object->getIndex());
         // else color = skyColor(ray.dir);
-        camera.matrix.at<cv::Vec3b>(rows - y,x) = map255(color);
+        camera.matrix.at<cv::Vec3b>(y,x) = map255(color);
     }
     }
 }
@@ -185,7 +205,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
 
             Source* source = dynamic_cast<Source*>(light); // Light class muss in Source class umgewandelt werden, weil nur source eine getPosition funktion hat
             Vec4f dir = source->getPosition() - info->position;
-            float dist = sqrt(scalarProduct(dir, dir));
+            float dist = sqrt(dir.dot(dir));
             cv::normalize(dir, dir);
             struct Ray lightRay = {.dir = dir, .position = info->position};
             intersectionInfo shadowHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
@@ -205,7 +225,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
         if(currentBounce < maxBounce){
 
             // reflected
-            Vec4f R = info->dir - 2*(scalarProduct(info->dir, info->normal)) * info->normal;
+            Vec4f R = info->dir - 2*(info->dir.dot(info->normal)) * info->normal;
             cv::normalize(R,R);
             R = R * -1;
             struct Ray reflectedRay = {.dir = R, .position = info->position};
@@ -215,7 +235,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             if(reflectedHit.didHit && reflectedHit.t > 0){
                 rcolor = mixLight(&reflectedHit, currentBounce + 1, maxBounce);
                 Vec3f Kr = info->object->getReflected();
-                float scalar = scalarProduct(R, info->normal);
+                float scalar = R.dot(info->normal);
                 for(int i = 0; i < 3; i++){ rcolor[i] = rcolor[i] * Kr[i] * scalar; }
             }else rcolor = {0,0,0};
             color = addLight(color, rcolor);
