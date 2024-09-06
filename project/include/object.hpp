@@ -24,7 +24,7 @@ struct intersectionInfo{
 };
 
 class Object{
-private:
+protected:
     Vec4f position;
     Vec3f ambient;
     Vec3f diffuse;
@@ -75,6 +75,7 @@ public:
 
 float length(Vec4f& x);
 float scalarProduct(const Vec4f& a, const Vec4f& b);
+void normalizeTransformationMatrix(cv::Mat& transformationMatrix);
 
 
 

@@ -77,6 +77,7 @@ Sphere::Sphere(Json::Value& input, Mat& matrix){
     }
 
     transformationMatrix = matrix.inv();
+    normalizeTransformationMatrix(transformationMatrix);
 }
 Vec4f Object::getPosition(){ return position;}
 Vec3f Object::getAmbient(){ return ambient;}
@@ -113,39 +114,37 @@ void Object::setIndex(Json::Value& Jindex){
 void Sphere::intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit){
     Mat resultD = transformationMatrix * ray.dir;
     Vec4f dm = resultD;
-    cv::normalize(dm, dm);
-    // dm = dm * -1;
+
+    Vec4f C = getPosition();
 
     Mat resultS = transformationMatrix * ray.position;
     Vec4f Sm = resultS;
-    Vec4f C = getPosition();
-    Vec4f offsetRayOrigin = Sm - C;
 
-    float dm_dm = scalarProduct(dm, dm);
-    float offset_dm = scalarProduct(offsetRayOrigin, dm);
-    float offset_offset = scalarProduct(offsetRayOrigin, offsetRayOrigin);
+    Vec4f L = C - Sm;
+    float tca = scalarProduct(L, dm);
+    if(tca < 0) return; // sphere is behind camera
 
-    float b = 2 * offset_dm;
+    float d2 = scalarProduct(L, L) - tca * tca;
+    if(d2 > radius * radius) return; // ray misses sphere
 
-    float discriminant = b*b - 4*dm_dm*(offset_offset - radius*radius);
+    float thc = sqrt(radius * radius - d2);
+    float t0 = tca - thc;
+    float t1 = tca + thc;
 
-    // no solution when d < 0 (ray misses sphere)
-    if(discriminant < 0) return;
-    // else it hit
+    if(t0 > t1) std::swap(t0,t1);
+    if(t0 < 0) {
+        t0 = t1;
+        if(t0 < 0) return;
+    }
 
-    float sqrtDiscriminant = sqrt(discriminant);
-    float t = (-b - sqrtDiscriminant) / (2 * dm_dm);
-    if(t >= closesHit->t) return;
-    closesHit->t = t;
+    if(t0 >= closesHit->t) return;
+    closesHit->t = t0;
     closesHit->didHit = true;
     closesHit->object = this;
     closesHit->dir = -dm;
 
-    Vec4f intersectionPoint = Sm + dm * t;
-    closesHit->position = intersectionPoint;
-    Vec4f normal = intersectionPoint - C;
-    cv::normalize(normal, normal);
-    closesHit->normal = normal;
+    closesHit->position = Sm + dm * t0;
+    closesHit->normal = (closesHit->position - C) / radius;
 
     // cout << "intersection: " << value << endl;
     return;
@@ -220,15 +219,15 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
         cout << "Proceeding with Index: 1" << endl;
     }
 
-    transformationMatrix = matrix;
+    transformationMatrix = matrix.inv();
+    normalizeTransformationMatrix(transformationMatrix);
 }
 
 void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit){
 
-    Mat resultD = transformationMatrix.inv() * ray.dir;
+    Mat resultD = transformationMatrix * ray.dir;
     Vec4f dm = resultD;
-    cv::normalize(dm, dm);
-    Mat resultS = transformationMatrix.inv() * ray.position;
+    Mat resultS = transformationMatrix * ray.position;
     Vec4f Sm = resultS;
  
    // since a halfspace is an infinite plane the there is either an intersection point or the ray coming from the camera is parallel to the plane
@@ -251,4 +250,15 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
     closesHit->normal = normal;
 
     return;    
+}
+
+void normalizeTransformationMatrix(cv::Mat& transformationMatrix) {
+    // Beispiel - Richtungsvektor
+    Vec4f exampleDir = Vec4f(1,0,0,0);
+    Mat transformationMat = transformationMatrix * exampleDir;
+    Vec4f transformationDir = transformationMat;
+
+    // calculate length of transformed Vector
+    float length = std::sqrt(transformationDir.dot(transformationDir));
+    transformationMatrix /= length;
 }
