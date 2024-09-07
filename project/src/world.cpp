@@ -159,6 +159,7 @@ void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
     Vec4f cameraPosition = camera.getPosition();
     Vec4f cameraObserver = camera.getObserver();
     for(int y = startRow; y < endRow; ++y){
+        Vec3b* row_ptr = camera.matrix.ptr<Vec3b>(y);  // Zeiger auf die Zeile
     for(int x = startCol; x < endCol; ++x){
         closestHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
         Vec4f delta {float(y) / dpi, float(x) / dpi,0,0};
@@ -172,7 +173,7 @@ void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
         Vec3f color = {1.0,0.7,0.5};
         if(closestHit.didHit) color = mixLight(&closestHit, 0, closestHit.object->getIndex());
         // else color = skyColor(ray.dir);
-        camera.matrix.at<cv::Vec3b>(y,x) = map255(color);
+        row_ptr[x] = map255(color);
     }
     }
 }
