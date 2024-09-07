@@ -151,6 +151,10 @@ void World::processMatrix(int numThreads) {
     for(auto& thread : threads) {
         thread.join();
     }
+
+    // flip the image
+    cv::Mat flipped = std::move(camera.matrix);
+    cv::flip(flipped, camera.matrix, 0);
 }
 
 void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
@@ -176,6 +180,7 @@ void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
         row_ptr[x] = map255(color);
     }
     }
+
 }
 
 Vec3f skyColor(Vec4f& d){
@@ -188,7 +193,7 @@ Vec3f skyColor(Vec4f& d){
 Vec3b map255(const Vec3f& color){
     Vec3b rgb;
     for(int i = 0; i < 3; i++){
-        rgb[i] = color[i] * 255;
+        rgb[i] = static_cast<unsigned char>(color[i] * 255);
     }
     return rgb;
 }
