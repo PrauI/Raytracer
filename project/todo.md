@@ -6,3 +6,4 @@
 - [ ] Reflected und refracted light
 - [ ] translation & rotation 
 - [ ] in main.cpp calcMatrix und createImage zusammenfassen 
+- [ ] in code descriptions
