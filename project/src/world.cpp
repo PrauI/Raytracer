@@ -187,7 +187,7 @@ Vec3f World::mixLight(struct intersectionInfo* info){
                 // todo da kann einiges an code aus dem for loop raus aus performance gründen, aber shmeißt mir dann einen bad access fehler und niemand weiß woher...
                 Source* source = dynamic_cast<Source*>(light); // Light class muss in Source class umgewandelt werden, weil nur source eine getPosition funktion hat
                 Vec4f dir = source->getPosition() - info->position;
-                float dist = sqrt(scalarProduct(dir, dir));
+                float dist = sqrt(dir.dot(dir));
                 cv::normalize(dir, dir);
                 intersectionInfo* hit = object->intersection(info->position, dir, this);
                 if(hit->didHit && hit->t < dist && hit->t > 0) inShadow = true;

@@ -27,6 +27,7 @@
 - [ ] get rid of the warnings
 - [ ] replace all scalarProduct() with the opencv dotproduct function
 - [ ] automatic testing 
+- [ ] optional: optimize code performance even more
 
 ## additional features
 we have to implement at least two additional features. some ideas:

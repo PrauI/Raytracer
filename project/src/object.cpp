@@ -101,9 +101,9 @@ struct intersectionInfo* Sphere::intersection(const Vec4f& S, const Vec4f& d, Wo
     Vec4f Sm = resultS;
 
     Vec4f offsetRayOrigin = Sm - C;
-    float a = scalarProduct(dm, dm);
-    float b = 2 * scalarProduct(offsetRayOrigin, dm);
-    float c = scalarProduct(offsetRayOrigin, offsetRayOrigin) - radius * radius;
+    float a = dm.dot(dm);
+    float b = 2 * offsetRayOrigin.dot(dm);
+    float c = offsetRayOrigin.dot(offsetRayOrigin) - radius * radius;
 
     float discriminant = b * b - 4 * a * c;
 
@@ -199,12 +199,12 @@ struct intersectionInfo* Halfspace::intersection(const Vec4f& S, const Vec4f& d,
     Vec4f Sm = resultS;
  
    // since a halfspace is an infinite plane the there is either an intersection point or the ray coming from the camera is parallel to the plane
-   float scalarValue = scalarProduct(this->normal, dm);
+   float scalarValue = this->normal.dot(dm);
    // cout << "normal: " << normal << " d: " << dm << " scalar: " << scalarValue << endl;
    if(scalarValue > -0.0001) return result; // they are parallel and there is no intersection
    Vec4f pos = getPosition();
 
-   float t = scalarProduct(pos - Sm, normal) / scalarValue;
+   float t = (pos-Sm).dot(normal) / scalarValue;
     if(t < 0) return result; // intersection Point behind camera
     if(t > 80) return result; // todo maybe change or delete
 
