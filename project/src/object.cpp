@@ -231,7 +231,7 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
     Vec4f Sm = resultS;
  
    // since a halfspace is an infinite plane the there is either an intersection point or the ray coming from the camera is parallel to the plane
-   float scalarValue = scalarProduct(this->normal, dm);
+   float scalarValue = this->normal.dot(dm);
    // cout << "normal: " << normal << " d: " << dm << " scalar: " << scalarValue << endl;
    if(scalarValue > -0.0001) return; // they are parallel and there is no intersection
    Vec4f pos = getPosition();
@@ -239,6 +239,9 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
    float t = scalarProduct(pos - Sm, normal) / scalarValue;
     if(t < 0) return; // intersection Point behind camera
     if(t > 80) return; // todo maybe change or delete
+   float t = (pos-Sm).dot(normal) / scalarValue;
+    if(t < 0) return result; // intersection Point behind camera
+    if(t > 80) return result; // todo maybe change or delete
 
     closesHit->t = t;
     closesHit->dir = -dm;
@@ -249,7 +252,7 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
     closesHit->object = this;
     closesHit->normal = normal;
 
-    return;    
+    return;
 }
 
 void normalizeTransformationMatrix(cv::Mat& transformationMatrix) {

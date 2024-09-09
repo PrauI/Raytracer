@@ -61,15 +61,15 @@ Vec3f Source::lightValue(struct intersectionInfo* info){
     Vec3f Kd = info->object->getDiffuse();
     Vec4f L = position - info->position;
     cv::normalize(L,L);
-    float scalar = scalarProduct(L, info->normal);
+    float scalar = L.dot(info->normal);
     if(scalar < 0) scalar = 0;
 
     // specular component
     Vec3f Es;
     Vec3f Ks = info->object->getSpecular();
-    Vec4f R = L - 2* scalarProduct(L, info->normal) * info->normal;
+    Vec4f R = L - 2* scalar * info->normal;
     cv::normalize(info->dir, info->dir);
-    float scalar2 = scalarProduct(R, -info->dir);
+    float scalar2 = R.dot(-info->dir);
     if(scalar2 < 0) scalar2 = 0;
 
      for(int i = 0; i < 3; i++){

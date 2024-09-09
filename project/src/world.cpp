@@ -128,8 +128,8 @@ void World::createImage(const string& filename){
 
 void World::hit(struct Ray& ray, Object* startingObject, intersectionInfo* closestHit){
     for(auto object : objectList){
-        if(object == startingObject) continue; 
-        object->intersection(ray, this, closestHit); 
+        if(object == startingObject) continue;
+        object->intersection(ray, this, closestHit);
     }
 }
 
@@ -260,8 +260,12 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             // color = addLight(color, tcolor);
         }
         
+        // color += incomingColor;
     }
     for(int i = 0; i < 3; i++) if(color[i] > 1) color[i] = 1;
+                //     color[0] = info->normal[0];
+                // color[1] = info->normal[1];
+                // color[2] = info->normal[2];
     
     return color;
 }
