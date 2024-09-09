@@ -19,10 +19,10 @@ struct intersectionInfo;
  * @brief Class representing the world / scene containing objects, lights, and a camera.
  */
 class World {
-    std::vector<Light*> lightList;
-    std::vector<Object*> objectList;
+    std::vector<Light*> lightList;   /**< List of lights in the world. */
+    std::vector<Object*> objectList; /**< List of objects in the world. */
 public:
-    Camera camera;
+    Camera camera; /**< Camera object in the world. */
     World();
 
     /**
@@ -58,9 +58,36 @@ public:
     * @param matrix Transformation matrix.
     */
     void setupObjects(Json::Value& object, Mat& matrix);
+
+    /**
+     * @brief shoots a ray for every pixel of the image and calculates the color
+     * @param startRow
+     * @param endRow
+     * @param startCol
+     * @param endCol
+     */
     void calcMatrix(int startRow, int endRow, int startCol, int endCol);
+    /**
+     * @brief processes the matrix with a given number of threads
+     * @param numThreads
+     */
     void processMatrix(int numThreads);
+
+    /**
+     * @brief calculates objects to test collision with ray
+     * @param ray light ray to check for collision
+     * @param startingObject object to ignore in the collision check
+     * @param closestHit intersection Info to store the closest hit
+     */
     void hit(struct Ray& ray, Object* startingObject, intersectionInfo* closestHit);
+
+ /**
+     * @brief calculates light color at specific intersection points. Calls reflection and refraction
+     * @param info intersection information
+     * @param currentBounce current bounce of the ray
+     * @param maxBounce maximum number of bounces
+     * @return calculated light value as a Vec3f between 0 and 1
+     */
     Vec3f mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce);
 };
 
@@ -78,6 +105,12 @@ Vec3b map255(const Vec3f& color);
  * @return
  */
 Vec3f addLight(Vec3f& color1, Vec3f& color2);
+
+/**
+ * @brief returns the color of the sky based on angle of light vector
+ * @param d direction of the ray
+ * @return color of the sky
+ */
 Vec3f skyColor(Vec4f& d);
 
 #endif // WORLD_HPP

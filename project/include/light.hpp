@@ -29,7 +29,7 @@ public:
      * @param info Intersection information.
      * @return Calculated light value as a Vec3f between 0 and 1.
      */
-    virtual Vec3f lightValue(struct intersectionInfo* info) = 0;
+     virtual Vec3f lightValue(struct intersectionInfo* info) = 0;
 };
 
 /**

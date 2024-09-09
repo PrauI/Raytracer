@@ -32,14 +32,14 @@ struct intersectionInfo{
  */
 class Object{
 protected:
-    Vec4f position;
-    Vec3f ambient;
-    Vec3f diffuse;
-    Vec3f specular;
-    Vec3f reflected;
-    Vec3f refracted;
-    float shininess;
-    int index;
+    Vec4f position;   /**< Position of the object. */
+    Vec3f ambient;    /**< Ambient color of the object. */
+    Vec3f diffuse;    /**< Diffuse color of the object. */
+    Vec3f specular;   /**< Specular color of the object. */
+    Vec3f reflected;  /**< Reflected color of the object. */
+    Vec3f refracted;  /**< Refracted color of the object. */
+    float shininess;  /**< Shininess of the object. */
+    int index;        /**< Index of refraction / reflection of the object. */
 
 
 public:
@@ -61,6 +61,11 @@ public:
      * @param color JSON value containing the color.
      */
     void setColor(Json::Value& color);
+
+    /**
+     * @brief Sets the index of refraction / reflection of the object from JSON input.
+     * @param Jindex JSON value containing the index.
+     */
     void setIndex(Json::Value& Jindex);
     Vec4f getPosition();
 
@@ -81,10 +86,37 @@ public:
      * @return Specular color of the object.
      */
     Vec3f getSpecular();
+
+ /**
+     * @brief Gets the reflected color of the object.
+     * @return Reflected color of the object.
+     */
     Vec3f getReflected();
+
+ /**
+     * @brief Gets the refracted color of the object.
+     * @return Refracted color of the object.
+     */
     Vec3f getRefracted();
+
+ /**
+     * @brief Gets the shininess of the object.
+     * @return Shininess of the object.
+     */
     float getShininess();
+
+ /**
+     * @brief Gets the index of refraction / reflection of the object.
+     * @return Index of refraction / reflection of the object.
+     */
     int getIndex();
+
+ /**
+     * @brief Calculates the intersection of a ray with the object.
+     * @param ray Ray to intersect with the object.
+     * @param scene Scene containing the object.
+     * @param closesHit Intersection information of the closest hit.
+     */
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) = 0;
 };
 
@@ -103,6 +135,10 @@ public:
     */
     Sphere(Json::Value& input, Mat& matrix);
 
+ /**
+     * @brief Sets the radius of the sphere from JSON input.
+     * @param input JSON value containing the radius.
+     */
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
 };
 
@@ -120,7 +156,18 @@ public:
     * @param matrix Transformation matrix.
     */
     Halfspace(Json::Value& input, Mat& matrix);
+
+ /**
+     * @brief Calculates the intersection of a ray with the half-space.
+     * @param ray Ray to intersect with the half-space.
+     * @param scene Scene containing the half-space.
+     * @param closesHit Intersection information of the closest hit.
+     */
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+/**
+     * @brief Sets the normal of the half-space from JSON input.
+     * @param input JSON value containing the normal.
+     */
     void setNormal(Json::Value& input);
 
     /**
@@ -143,6 +190,11 @@ float length(Vec4f& x);
  * @return Scalar product of the two vectors.
  */
 float scalarProduct(const Vec4f& a, const Vec4f& b);
+
+/**
+ * @brief Normalizes a transformation matrix.
+ * @param transformationMatrix Transformation matrix to normalize.
+ */
 void normalizeTransformationMatrix(cv::Mat& transformationMatrix);
 
 

@@ -239,9 +239,6 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
    float t = scalarProduct(pos - Sm, normal) / scalarValue;
     if(t < 0) return; // intersection Point behind camera
     if(t > 80) return; // todo maybe change or delete
-   float t = (pos-Sm).dot(normal) / scalarValue;
-    if(t < 0) return result; // intersection Point behind camera
-    if(t > 80) return result; // todo maybe change or delete
 
     closesHit->t = t;
     closesHit->dir = -dm;
