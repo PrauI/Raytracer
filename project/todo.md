@@ -25,7 +25,7 @@
     - [ ] installation guide
     - [ ] documentation of how the program works
 - [ ] get rid of the warnings
-- [ ] replace all scalarProduct() with the opencv dotproduct function
+- [x] replace all scalarProduct() with the opencv dotproduct function
 - [ ] automatic testing 
 - [ ] optional: optimize code performance even more
 
