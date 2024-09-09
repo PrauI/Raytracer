@@ -121,10 +121,10 @@ void Sphere::intersection(const struct Ray& ray, World* scene, intersectionInfo*
     Vec4f Sm = resultS;
 
     Vec4f L = C - Sm;
-    float tca = scalarProduct(L, dm);
+    float tca = L.dot(dm);
     if(tca < 0) return; // sphere is behind camera
 
-    float d2 = scalarProduct(L, L) - tca * tca;
+    float d2 = L.dot(L) - tca * tca;
     if(d2 > radius * radius) return; // ray misses sphere
 
     float thc = sqrt(radius * radius - d2);
@@ -153,10 +153,6 @@ void Sphere::intersection(const struct Ray& ray, World* scene, intersectionInfo*
 
 float length(Vec4f& x){
     return sqrt(pow(x[0],2) + pow(x[1], 2) + pow(x[2], 2) + pow(x[3], 2));
-}
-
-float scalarProduct(const Vec4f& a, const Vec4f& b){
-    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
 }
 
 
@@ -236,7 +232,7 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
    if(scalarValue > -0.0001) return; // they are parallel and there is no intersection
    Vec4f pos = getPosition();
 
-   float t = scalarProduct(pos - Sm, normal) / scalarValue;
+   float t = (pos - Sm).dot(normal) / scalarValue;
     if(t < 0) return; // intersection Point behind camera
     if(t > 80) return; // todo maybe change or delete
 

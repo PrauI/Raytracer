@@ -183,13 +183,6 @@ public:
  */
 float length(Vec4f& x);
 
-/**
- * @brief Calculates the scalar product of two vectors.
- * @param a First vector.
- * @param b Second vector.
- * @return Scalar product of the two vectors.
- */
-float scalarProduct(const Vec4f& a, const Vec4f& b);
 
 /**
  * @brief Normalizes a transformation matrix.
