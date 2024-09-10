@@ -63,6 +63,11 @@ public:
     void setColor(Json::Value& color);
 
     /**
+     * @brief Sets the default color of the object.
+     */
+    void setDefaultColor();
+
+    /**
      * @brief Sets the index of refraction / reflection of the object from JSON input.
      * @param Jindex JSON value containing the index.
      */

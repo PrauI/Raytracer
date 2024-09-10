@@ -63,7 +63,7 @@ Sphere::Sphere(Json::Value& input, Mat& matrix){
     }catch(const std::exception& e){
         std::cerr << e.what() << endl;
         cout << "Proceeding with default colors" << endl;
-        // todo defaultColor
+        setDefaultColor();
     }
 
     // set Index
@@ -87,6 +87,16 @@ Vec3f Object::getSpecular(){ return specular;}
 Vec3f Object::getReflected(){ return reflected; }
 Vec3f Object::getRefracted(){ return refracted; }
 int Object::getIndex(){ return index; }
+
+void Object::setDefaultColor() {
+    ambient = Vec3f(1.0, 1.0, 1.0);
+    diffuse = Vec3f(1.0, 1.0, 1.0);
+    specular = Vec3f(1.0, 1.0, 1.0);
+    reflected = Vec3f(1.0, 1.0, 1.0);
+    refracted = Vec3f(1.0, 1.0, 1.0);
+    shininess = 0.0;
+    index = 1;
+}
 
 void Object::setColor(Json::Value& color){
     // todo try catch
@@ -202,7 +212,7 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
     }catch(const std::exception& e){
         std::cerr << e.what() << endl;
         cout << "Proceeding with default colors" << endl;
-        // todo defaultColor
+        setDefaultColor();
     }
 
      // set Index
@@ -213,6 +223,7 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
     }catch(const std::exception& e){
         std::cerr << e.what() << endl;
         cout << "Proceeding with Index: 1" << endl;
+        index = 1;
     }
 
     transformationMatrix = matrix.inv();
