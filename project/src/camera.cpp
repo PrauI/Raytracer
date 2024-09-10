@@ -5,8 +5,14 @@
 
 using cv::Vec4f, cv::Vec3f, std::cout, std::endl, std::string;
 
-Camera::Camera(const Vec4f& observerPosition, const Vec4f& P, const Vec4f& screen, const int dpi): observerPosition(observerPosition), screenPosition(P), screen(screen), dpi(dpi) {};
-Camera::Camera(): Camera(Vec4f(0,0,-10,1), Vec4f(-1,-2,-5,1), Vec4f(2,4,0,0), 100) {};
+Camera::Camera(const Vec4f& observerPosition, const Vec4f& P, const Vec4f& screen, const int dpi): observerPosition(observerPosition), screenPosition(P), screen(screen), dpi(dpi) {
+    // initialise Matrix
+    int height = dpi*screen[0];
+    int width = dpi*screen[1];
+    matrix = cv::Mat(height, width, CV_8UC3, cv::Scalar(255,255,255));
+};
+Camera::Camera(): Camera(Vec4f(0,0,-10,1), Vec4f(-1,-2,-5,1), Vec4f(2,4,0,0), 100) {
+};
 
 Camera::Camera(Json::Value& jfile){
 

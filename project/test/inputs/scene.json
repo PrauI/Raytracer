@@ -1,0 +1,139 @@
+{
+    "screen": {
+        "dpi": 200,
+        "dimensions": [2, 4],
+        "position": [-1, -2, -10],
+        "observer": [0, 0, -15]
+    },
+
+    "medium": {
+        "ambient": [0.1, 0.1, 0.1],
+        "index": 1,
+        "recursion": 1
+    },
+
+    "sources": [
+        {
+            "position": [50, 50, -10],
+            "intensity": [0.5, 0.5, 0.5]
+        }
+    ],
+    
+    "objects": [
+        {
+            "scaling":{
+                "factors": [1.0,1.0,1.0],
+                "subject": {
+                    "translation":{
+                        "factors":[0.0, 0.0, 0.0],
+                        "subject":{
+                            "halfSpace": {
+                                "position": [-2, 0, 0],
+                                "normal": [1,0,0],
+                                "color": {
+                                    "ambient": [1, 1, 1],
+                                    "diffuse": [1, 1, 1],
+                                    "specular": [1, 1, 1],
+                                    "reflected": [1, 1, 1],
+                                    "refracted": [1, 1, 1],
+                                    "shininess": 1
+                                    },
+                                "index": 1
+                                }
+                    }
+                }
+            }} 
+        },
+        {
+            "scaling":{
+                "factors": [1.0,1.0,1.0],
+                "subject": {
+                    "translation":{
+                        "factors":[0.0, 0.0, 0.0],
+                        "subject":{
+                            "sphere": {
+                                "position": [-2, -1, 1],
+                                "radius": 1,
+                                "color": {
+                                    "ambient": [1, 1, 1],
+                                    "diffuse": [1, 1, 1],
+                                    "specular": [1, 1, 1],
+                                    "reflected": [1, 1, 1],
+                                    "refracted": [1, 1, 1],
+                                    "shininess": 1
+                                    },
+                                "index": 2
+                                }
+                    }
+                }
+            }} 
+        },
+        {
+            "scaling":{
+                "factors": [1.0,1.0,1.0],
+                "subject": {
+                    "translation":{
+                        "factors":[0.0, 0.0, 0.0],
+                        "subject":{
+                            "sphere": {
+                                "position": [2, 3, 1],
+                                "radius": 4,
+                                "color": {
+                                    "ambient": [1, 1, 0],
+                                    "diffuse": [1, 1, 0],
+                                    "specular": [1, 1, 0],
+                                    "reflected": [1, 1, 0],
+                                    "refracted": [1, 1, 0],
+                                    "shininess": 1
+                                    },
+                                "index": 2
+                                }
+                    }
+                }
+            }} 
+        },
+        {"union": [
+                {"scaling": {
+                    "factors": [4, 4, 4],
+                    "subject": {
+                        "sphere": {
+                            "position": [-1, 0, 0],
+                            "radius": 1.0,
+                            "color": {
+                                "ambient": [1, 1, 1],
+                                "diffuse": [1, 1, 1],
+                                "specular": [1, 1, 1],
+                                "reflected": [1, 1, 1],
+                                "refracted": [1, 1, 1],
+                                "shininess": 1
+                                },
+                            "index": 1
+                            }
+                        }
+                    }
+
+                },
+                {"translation": {
+                    "factors": [0, 0, 2.5],
+                    "subject": {
+                        "halfSpace": {
+                            "position": [-2, 0, 0],
+                            "normal": [-2, 0, 0],
+                            "color": {
+                                "ambient": [1, 1, 1],
+                                "diffuse": [1, 1, 1],
+                                "specular": [1, 1, 1],
+                                "reflected": [1, 1, 1],
+                                "refracted": [1, 1, 1],
+                                "shininess": 1
+                                },
+                            "index": 1
+                            }
+                        }
+                    }
+
+                }
+            ]
+        }
+    ]
+}

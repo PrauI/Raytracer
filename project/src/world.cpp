@@ -84,7 +84,7 @@ void World::readFile(const string& filename) {
 void World::readObjects(Json::Value& objects){
     try {
         if(!objects.isArray()) throw std::runtime_error("Objects not in correct format");
-        if(!objects.size() == 0) throw std::runtime_error("No objects provided");
+        if(objects.size() == 0) throw std::runtime_error("No objects provided");
         for(auto object : objects) {
 
             // iterating over Objects

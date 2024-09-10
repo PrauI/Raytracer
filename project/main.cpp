@@ -14,15 +14,15 @@
 
 using cv::Vec4f, cv::Vec3f;
 
-int main() {
+int main(int argc, char **argv) {
     auto start = std::chrono::high_resolution_clock::now();
     World world;
 
     // Festlegen des Dateinamens fpr das zu speichernde Bild
-    std::string filename = "black_image.png";
+    std::string filename = argv[1];
 
     // Festlegen des Dateinamens für die Eingabedatei
-    std::string inputFile = "scene.json";
+    std::string inputFile = argv[2];
 
     // Einlesen der Parameter zum Erstellen einer Szene / Welt
     auto startReading = std::chrono::high_resolution_clock::now();
