@@ -16,51 +16,92 @@ using std::string;
 World::World(){}
 
 void World::readFile(const string& filename) {
-    std::ifstream input_file(filename, std::ifstream::binary);
     Json::Value scene;
-    input_file >> scene;
-
-    // setup camera
-    Json::Value screen;
-    screen = scene["screen"];
-    camera = Camera(screen);
-
-    // setup Lights
-    Json::Value medium;
-    medium = scene["medium"];
-    lightList.push_back(new Ambient(medium));
-
-    Json::Value sources = scene["sources"];
-    cout << "Light Sources: " << endl;
-    if(sources.isArray()){
-        for(int i = 0; i < int(sources.size()); i++){
-            lightList.push_back(new Source(sources[i]));
-        }
-    }else{
-        // error handling..
+    try {
+        std::ifstream input_file(filename, std::ifstream::binary);
+        if(!input_file.is_open()) throw std::runtime_error("Unable to open file");
+        input_file >> scene;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << ": " << filename << std::endl;
+        return;
     }
 
+    // setup camera
+    try {
+        Json::Value screen;
+        if(!scene.isMember(("screen"))) throw std::runtime_error("No screen provided in file");
+        screen = scene["screen"];
+        camera = Camera(screen);
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        std::cout << "using default camera settings" << std::endl;
+        camera = Camera();
+
+    }
+
+    // setup Lights
+    try {
+        Json::Value medium;
+        if(!scene.isMember("medium")) throw std::runtime_error("No medium light source provided in file");
+        medium = scene["medium"];
+        lightList.push_back(new Ambient(medium));
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        std::cout << "using default ambient light settings" << std::endl;
+        lightList.push_back(new Ambient());
+    }
+
+    // setup sources
+    try {
+        if(!scene.isMember(("sources"))) throw std::runtime_error("No light sources provided in file");
+        Json::Value sources = scene["sources"];
+        if(!sources.isArray()) throw std::runtime_error("Light Sources not in correct format");
+        cout << "Light Sources: " << endl;
+        for(auto source : sources) {
+            lightList.push_back(new Source(source));
+        }
+
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        std::cout << "Careful! No lights make it hart to see in the dark :(" << std::endl << "Continuing only with Ambient light" << std::endl;
+        lightList = {};
+    }
+
+
     // setup objects
-    Json::Value objects;
-    objects = scene["objects"];
-    readObjects(objects);
+    try {
+        if(!scene.isMember("objects")) throw std::runtime_error("No objects provided in file");
+        Json::Value objects;
+        objects = scene["objects"];
+        readObjects(objects);
+    }catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        std::cout << "Whats the point of raytracing, when there is nothing to see :(" << std::endl;
+        objectList = {};
+    }
 }
 
 void World::readObjects(Json::Value& objects){
-    if(objects.isArray()){
-        for(int i = 0; i < int(objects.size()); i++){
+    try {
+        if(!objects.isArray()) throw std::runtime_error("Objects not in correct format");
+        if(!objects.size() == 0) throw std::runtime_error("No objects provided");
+        for(auto object : objects) {
+
             // iterating over Objects
-            Mat matrix = (cv::Mat_<float>(4,4) << 
+            Mat matrix = (cv::Mat_<float>(4,4) <<
                                             1.0, 0.0, 0.0, 0.0,
                                             0.0, 1.0, 0.0, 0.0,
                                             0.0, 0.0, 1.0, 0.0,
                                             0.0, 0.0, 0.0, 1.0);
             // for every transformation done to an object we go deeper in the json file,
             // until we get to the subject, in which case we break out of the loop.
-            setupObjects(objects[i], matrix);       
+            setupObjects(object, matrix);
         }
-    }else{
-        // todo in try catch umwandeln
+
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        std::cout << "No objects in scene. Boring!" << std::endl;
+        objectList = {};
     }
 }
 

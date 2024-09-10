@@ -26,6 +26,8 @@ Ambient::Ambient(Json::Value& medium){
     }
 }
 
+Ambient::Ambient(): Light(){};
+
 Source::Source(Json::Value& input){
     isAmbient = false;
     if(input.isMember("position") && input.isMember("intensity")){

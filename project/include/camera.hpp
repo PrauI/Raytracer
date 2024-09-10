@@ -38,6 +38,12 @@ public:
     Mat matrix;
 
     /**
+     *@brief Default constructor for camera
+     * setting camera to default values Observer position (0,0,-10), screen poistion (-1, -2, -5), screen dimensions (2, 4) and dpi 62
+     */
+     Camera();
+
+    /**
      * @brief Construct a new Camera object
      *
      * @param observerPosition: position of the observer
@@ -45,14 +51,26 @@ public:
      * @param screen: dimensions of the screen
      * @param dpi: density per pixel of the screen
      */
-    Camera(Vec4f& observerPosition, Vec4f& P, Vec4f& screen, int dpi);
+    Camera(const Vec4f& observerPosition, const Vec4f& P, const Vec4f& screen, const int dpi);
+
     /**
      * @brief Construct a new Camera object
      *
      * @param Jason value which holds the camera parameters in the correct format
      */
     Camera(Json::Value& screen);
-    Camera();
+
+
+    /**
+     * @brief Copy assignment operator
+     */
+     Camera& operator=(const Camera& other);
+
+    /**
+    * @brief Move assignment operator
+    */
+    Camera& operator=(Camera&& other);
+
      /**
      * @brief Capture the image and save it to a file
      *

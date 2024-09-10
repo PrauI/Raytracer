@@ -5,9 +5,8 @@
 
 using cv::Vec4f, cv::Vec3f, std::cout, std::endl, std::string;
 
-Camera::Camera(Vec4f& observerPosition, Vec4f& P, Vec4f& screen, int dpi): observerPosition(observerPosition), screenPosition(P), screen(screen), dpi(dpi) {};
-
-Camera::Camera(){}
+Camera::Camera(const Vec4f& observerPosition, const Vec4f& P, const Vec4f& screen, const int dpi): observerPosition(observerPosition), screenPosition(P), screen(screen), dpi(dpi) {};
+Camera::Camera(): Camera(Vec4f(0,0,-10,1), Vec4f(-1,-2,-5,1), Vec4f(2,4,0,0), 100) {};
 
 Camera::Camera(Json::Value& jfile){
 
@@ -81,6 +80,32 @@ Camera::Camera(Json::Value& jfile){
     int height = dpi*screen[0];
     int width = dpi*screen[1];
     matrix = cv::Mat(height, width, CV_8UC3, cv::Scalar(255,255,255));
+}
+
+// copy assigment operator
+Camera& Camera::operator=(const Camera& other){
+    if(this == &other) return *this; // self-assignment check
+
+    // copy Camera
+    observerPosition = other.observerPosition;
+    screenPosition = other.screenPosition;
+    screen = other.screen;
+    dpi = other.dpi;
+    matrix = other.matrix;
+    return *this;
+}
+
+// move assignment operator
+Camera& Camera::operator=(Camera&& other) {
+    if(this == &other) return *this;
+
+    // Move Camera
+    observerPosition = std::move(other.observerPosition);
+    screenPosition = std::move(other.screenPosition);
+    screen = std::move(other.screen);
+    dpi = std::move(other.dpi);
+    matrix = std::move(other.matrix);
+    return *this;
 }
 
 void Camera::capture(const string& filename){

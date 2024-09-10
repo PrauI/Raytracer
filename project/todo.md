@@ -35,4 +35,5 @@ we have to implement at least two additional features. some ideas:
 - [ ] more shapes, like triangle
 - [ ] sky Box / sky sphere
 - [ ] texture mapping ( i think its similaar to skysphere (at least for spheres))
+- [ ] directional light
 

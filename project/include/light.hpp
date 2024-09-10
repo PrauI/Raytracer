@@ -25,6 +25,11 @@ public:
     Vec3f intensity;
 
     /**
+     * @brief Default Constructor for Light
+     */
+     Light(): isAmbient(true), intensity(Vec3f(0.5, 0.5, 0.5)){};
+
+    /**
      * @brief Pure virtual function to calculate the light value at a given intersection point.
      * @param info Intersection information.
      * @return Calculated light value as a Vec3f between 0 and 1.
@@ -45,6 +50,12 @@ public:
      * @param input JSON value containing the ambient light parameters.
      */
     Ambient(Json::Value& input);
+
+    /**
+     * brief Default Constructor for Ambient Light
+     */
+    Ambient();
+
     /**
      * @brief Calculates the light value at a given intersection point for ambient light.
      *
