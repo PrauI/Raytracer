@@ -1,7 +1,7 @@
 # Raytracing project
 
 - [x] Error handling in the Camera input 
-- [ ] Error handling in der world::readFile (see all the try catch blocks from the other inputs)
+- [ ] Philipp: Error handling in der world::readFile (see all the try catch blocks from the other inputs)
 - [ ] error handling überall wo ich (Philipp) kommentar geschrieben hab, dass error handling fehlt
 - [x] Reflected light
 - [ ] refracted light
