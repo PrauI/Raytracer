@@ -11,7 +11,7 @@
 - [ ] in main.cpp calcMatrix und createImage zusammenfassen 
 - [x] in code descriptions
 - [ ] alle todos in code abarbeiten
-- [ ] sphere default color method / function
+- [ ] Philipp: sphere default color method / function
   - [ ] add to sphere and halfspace constructor
 - [ ] unionize objects and add to world::setupObjects
 - [ ] try catch in Object::setColor

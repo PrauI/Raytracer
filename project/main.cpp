@@ -19,6 +19,10 @@ int main(int argc, char **argv) {
     World world;
 
     // Festlegen des Dateinamens fpr das zu speichernde Bild
+    if(argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " <output-filename>.png <input-filename>.json" << std::endl;
+        return 1;
+    }
     std::string filename = argv[1];
 
     // Festlegen des Dateinamens für die Eingabedatei
