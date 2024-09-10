@@ -1,7 +1,7 @@
 # Raytracing project
 
 - [x] Error handling in the Camera input 
-- [ ] Philipp: Error handling in der world::readFile (see all the try catch blocks from the other inputs)
+- [x] Error handling in der world::readFile (see all the try catch blocks from the other inputs)
 - [ ] error handling überall wo ich (Philipp) kommentar geschrieben hab, dass error handling fehlt
 - [x] Reflected light
 - [ ] refracted light
@@ -28,6 +28,9 @@
 - [x] replace all scalarProduct() with the opencv dotproduct function
 - [ ] automatic testing 
 - [ ] optional: optimize code performance even more
+- [ ] testing
+  - [ ] more tests
+  - [ ] solve exisitng test which doesnt work
 
 ## additional features
 we have to implement at least two additional features. some ideas:
