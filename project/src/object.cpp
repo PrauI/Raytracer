@@ -86,7 +86,7 @@ float Object::getShininess() {return shininess;}
 Vec3f Object::getSpecular(){ return specular;}
 Vec3f Object::getReflected(){ return reflected; }
 Vec3f Object::getRefracted(){ return refracted; }
-int Object::getIndex(){ return index; }
+float Object::getIndex(){ return index; }
 
 void Object::setDefaultColor() {
     ambient = Vec3f(1.0, 1.0, 1.0);
@@ -95,28 +95,27 @@ void Object::setDefaultColor() {
     reflected = Vec3f(1.0, 1.0, 1.0);
     refracted = Vec3f(1.0, 1.0, 1.0);
     shininess = 0.0;
-    index = 1;
 }
 
 void Object::setColor(Json::Value& color){
     // todo try catch
 
     for(int i = 0; i < 3; i++){
-        ambient[i] = color["ambient"][i].asInt();
-        diffuse[i] = color["diffuse"][i].asInt();
-        specular[i] = color["specular"][i].asInt();
-        reflected[i] = color["reflected"][i].asInt();
-        refracted[i] = color["refracted"][i].asInt();
+        ambient[i] = color["ambient"][i].asFloat();
+        diffuse[i] = color["diffuse"][i].asFloat();
+        specular[i] = color["specular"][i].asFloat();
+        reflected[i] = color["reflected"][i].asFloat();
+        refracted[i] = color["refracted"][i].asFloat();
     }
     shininess = color["shininess"].asFloat();
 }
 
 void Object::setIndex(Json::Value& Jindex){
     try{
-        index = Jindex.asInt();
+        index = Jindex.asFloat();
     }catch(const std::exception& e){
         cout << e.what() << endl;
-        index = 1;
+        index = 1.0;
         cout << "Proceeding with Index: 1" << endl;
     }
 }

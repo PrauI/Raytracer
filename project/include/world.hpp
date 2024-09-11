@@ -111,6 +111,8 @@ Vec3f addLight(Vec3f& color1, Vec3f& color2);
  * @param d direction of the ray
  * @return color of the sky
  */
-Vec3f skyColor(Vec4f& d);
+Vec3f skyColor(const Vec4f& d);
+
+Vec4f refractedDir(const float n, const float nt, const Vec4f& dir, const Vec4f& normal);
 
 #endif // WORLD_HPP

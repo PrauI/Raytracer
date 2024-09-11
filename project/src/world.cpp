@@ -216,18 +216,17 @@ void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
         hit(ray, nullptr, &closestHit); // nullptr weil wir die kamera sind
 
         Vec3f color = {1.0,0.7,0.5};
-        if(closestHit.didHit) color = mixLight(&closestHit, 0, closestHit.object->getIndex());
-        // else color = skyColor(ray.dir);
+        if(closestHit.didHit) color = mixLight(&closestHit, 0, 2);
+        else color = skyColor(ray.dir);
         row_ptr[x] = map255(color);
     }
     }
 
 }
 
-Vec3f skyColor(Vec4f& d){
-    // float a = 0.5 * (d[0] + 1.0);
-    // return (1.0 - a) * Vec3f{1.0, 0.7, 0.5} + a * Vec3f{1.0, 1.0, 1.0};
-    return Vec3f{1.0, 0.7, 0.5};
+Vec3f skyColor(const Vec4f& d){
+    float a = 0.5 * (d[0] + 1.0);
+    return (1.0 - a) * Vec3f{1.0, 1.0, 1.0} + a * Vec3f{1.0, 0.7, 0.5};
 }
 
 // maped zahlen aus dem raum 0-1 auf 0-255
@@ -246,6 +245,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
     Vec3f color = {0,0,0};
     for(auto light : lightList){
 
+        // calculate if intersection point lays in shadow
         // calculate if ray between object and light is blocked by an object
         bool inShadow = false;
         if(!light->isAmbient){
@@ -272,33 +272,53 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
         if(currentBounce < maxBounce){
 
             // reflected
-            Vec4f R = info->dir - 2*(info->dir.dot(info->normal)) * info->normal;
+            float scalar = info->dir.dot(info->normal);
+            Vec4f R = info->dir - 2*(scalar) * info->normal;
             cv::normalize(R,R);
             R = R * -1;
             struct Ray reflectedRay = {.dir = R, .position = info->position};
             intersectionInfo reflectedHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
             hit(reflectedRay, info->object, &reflectedHit);
             Vec3f rcolor;
+            Vec3f Kr = info->object->getReflected();
             if(reflectedHit.didHit && reflectedHit.t > 0){
                 rcolor = mixLight(&reflectedHit, currentBounce + 1, maxBounce);
-                Vec3f Kr = info->object->getReflected();
-                float scalar = R.dot(info->normal);
-                for(int i = 0; i < 3; i++){ rcolor[i] = rcolor[i] * Kr[i] * scalar; }
-            }else rcolor = {0,0,0};
+                for(int i = 0; i < 3; i++){ rcolor[i] = rcolor[i] * Kr[i] * 0.5; }
+            }else {
+                Vec3f sky = skyColor(reflectedRay.dir);
+                for(int i = 0; i < 3 ; i++) rcolor[i] = sky[i] * Kr[i] * 0.5;
+            }
             color = addLight(color, rcolor);
 
             // refracted
-            // float scalar = scalarProduct(info->dir, info->normal);
-            // // Vec4f T = 1.0 / 1.5168 * (info->dir - (scalar + sqrt(pow(1.0/1.5169, 2) + pow(scalar, 2) - 1) * info->normal));
-            // cv::normalize(T, T);
-            // intersectionInfo* refractedHit = hit(info->position, T, info->object); // evtl. nullptr
-            // Vec3f tcolor;
-            // if(refractedHit != nullptr && refractedHit->didHit && refractedHit->t > 0){
-            //     tcolor = mixLight(refractedHit, currentBounce + 1, maxBounce);
-            //     Vec3f Kt = info->object->getRefracted();
-            //     for(int i = 0; i < 3; i++){ tcolor[i] = tcolor[i] * Kt[i]; }
-            // }else tcolor = {0,0,0};
-            // color = addLight(color, tcolor);
+            float n = 1.0;
+            float nt = info->object->getIndex();
+            Vec4f T = refractedDir(n, nt, info->dir, info->normal);
+            intersectionInfo refractedHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+            intersectionInfo selfCollision = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+            struct Ray refractedRay = {.dir = T, .position = info->position + 0.00001 * T}; // multiplication to avoid intersection with startingpoint
+
+            // entering the object to calculate where it leaves
+            info->object->intersection(refractedRay, nullptr, &selfCollision);
+            if(!selfCollision.didHit) {
+                // it already left object
+
+            }else {
+                // it left object on the other side
+                Vec4f T = refractedDir(nt, n, refractedRay.dir, selfCollision.normal * -1);
+                refractedRay = {.dir = T, .position = refractedHit.position};
+            }
+            hit(refractedRay, info->object, &refractedHit);
+            Vec3f tcolor;
+            Vec3f Kt = info->object->getRefracted();
+            if(refractedHit.didHit && refractedHit.t > 0){
+                 tcolor = mixLight(&refractedHit, currentBounce + 1, maxBounce);
+                 for(int i = 0; i < 3; i++){ tcolor[i] = tcolor[i] * Kt[i] * 0.5; }
+             }else{
+                 Vec3f sky = skyColor(refractedRay.dir);
+                 for(int i = 0; i < 3 ; i++) tcolor[i] = sky[i] * Kt[i] * 0.5;
+             }
+             color = addLight(color, tcolor);
         }
         
         // color += incomingColor;
@@ -311,13 +331,23 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
     return color;
 }
 
+Vec4f refractedDir(const float n, const float nt, const Vec4f& dir, const Vec4f& normal) {
+    const float refractiveIndex = n / nt;
+    float scalar = dir.dot(normal);
+    Vec4f a = (scalar + sqrt(pow( 1 /refractiveIndex, 2) + pow(scalar, 2) - 1)) * normal;
+    Vec4f T = dir - a;
+    T *= (-refractiveIndex);
+    cv::normalize(T, T);
+    return T;
+}
+
 // Funktion zum addieren von Licht / Helligkeit
 // Light intensity is percived logarithmicaly, addition works as follows:
 // E = E1 + E2 = 1 - (1 - E1)(1 - E2)
 Vec3f addLight(Vec3f& color1, Vec3f& color2){
     Vec3f finalColor = {0,0,0};
     for(int i = 0; i < 3; i++){
-        finalColor[i] = 1.0 - (1.0 - color1[i]) * (1.0 - color2[i]);
+        finalColor[i] = color1[i] + (1.0 - color1[i]) * color2[i];
     }
     return finalColor;
 }

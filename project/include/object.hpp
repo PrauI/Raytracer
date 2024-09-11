@@ -39,7 +39,7 @@ protected:
     Vec3f reflected;  /**< Reflected color of the object. */
     Vec3f refracted;  /**< Refracted color of the object. */
     float shininess;  /**< Shininess of the object. */
-    int index;        /**< Index of refraction / reflection of the object. */
+    float index;        /**< Index of refraction / reflection of the object. */
 
 
 public:
@@ -114,7 +114,7 @@ public:
      * @brief Gets the index of refraction / reflection of the object.
      * @return Index of refraction / reflection of the object.
      */
-    int getIndex();
+    float getIndex();
 
  /**
      * @brief Calculates the intersection of a ray with the object.

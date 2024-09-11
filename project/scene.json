@@ -15,10 +15,10 @@
     "sources": [
         {
             "position": [50, 50, -10],
-            "intensity": [0.5, 0.5, 0.5]
+            "intensity": [0.82, 0.97, 0.98]
         }
     ],
-    
+
     "objects": [
         {
             "scaling":{
@@ -34,15 +34,15 @@
                                     "ambient": [1, 1, 1],
                                     "diffuse": [1, 1, 1],
                                     "specular": [1, 1, 1],
-                                    "reflected": [1,1,1],
+                                    "reflected": [0.1,0.1,0.1],
                                     "refracted": [0,0,0],
-                                    "shininess": 0.5
-                                    },
-                                "index": 1
-                                }
+                                    "shininess": 1
+                                },
+                                "index": 1.5
+                            }
+                        }
                     }
-                }
-            }} 
+                }}
         },
         {
             "scaling":{
@@ -52,21 +52,21 @@
                         "factors":[0.0, 0.0, 0.0],
                         "subject":{
                             "sphere": {
-                                "position": [-2, -1, 1],
+                                "position": [-1.5, -1, 1],
                                 "radius": 1,
                                 "color": {
                                     "ambient": [1, 1, 1],
-                                    "diffuse": [1, 1, 1],
+                                    "diffuse": [0.1, 0.1, 0.1],
                                     "specular": [1, 1, 1],
-                                    "reflected": [1, 1, 1],
-                                    "refracted": [1, 1, 1],
+                                    "reflected": [0.8, 0.8, 0.8],
+                                    "refracted": [0,0,0],
                                     "shininess": 1
-                                    },
-                                "index": 2
-                                }
+                                },
+                                "index": 1.5
+                            }
+                        }
                     }
-                }
-            }} 
+                }}
         },
         {
             "scaling":{
@@ -79,61 +79,61 @@
                                 "position": [2, 3, 1],
                                 "radius": 4,
                                 "color": {
-                                    "ambient": [1, 1, 0],
-                                    "diffuse": [1, 1, 0],
-                                    "specular": [1, 1, 0],
-                                    "reflected": [1, 1, 0],
-                                    "refracted": [1, 1, 0],
+                                    "ambient": [1, 1, 1],
+                                    "diffuse": [0, 0, 0],
+                                    "specular": [1, 1, 1],
+                                    "reflected": [0, 0, 0],
+                                    "refracted": [0.8,0.8,0.8],
                                     "shininess": 1
-                                    },
-                                "index": 2
-                                }
+                                },
+                                "index": 1.5
+                            }
+                        }
                     }
-                }
-            }} 
+                }}
         },
         {"union": [
-                {"scaling": {
-                    "factors": [4, 4, 4],
-                    "subject": {
-                        "sphere": {
-                            "position": [-1, 0, 0],
-                            "radius": 1.0,
-                            "color": {
-                                "ambient": [1, 1, 1],
-                                "diffuse": [1, 1, 1],
-                                "specular": [1, 1, 1],
-                                "reflected": [1, 1, 1],
-                                "refracted": [1, 1, 1],
-                                "shininess": 1
-                                },
-                            "index": 1
-                            }
-                        }
+            {"scaling": {
+                "factors": [4, 4, 4],
+                "subject": {
+                    "sphere": {
+                        "position": [-1, 0, 0],
+                        "radius": 1.0,
+                        "color": {
+                            "ambient": [1, 1, 1],
+                            "diffuse": [1, 1, 1],
+                            "specular": [1, 1, 1],
+                            "reflected": [1, 1, 1],
+                            "refracted": [1, 1, 1],
+                            "shininess": 1
+                        },
+                        "index": 1
                     }
-
-                },
-                {"translation": {
-                    "factors": [0, 0, 2.5],
-                    "subject": {
-                        "halfSpace": {
-                            "position": [-2, 0, 0],
-                            "normal": [-2, 0, 0],
-                            "color": {
-                                "ambient": [1, 1, 1],
-                                "diffuse": [1, 1, 1],
-                                "specular": [1, 1, 1],
-                                "reflected": [1, 1, 1],
-                                "refracted": [1, 1, 1],
-                                "shininess": 1
-                                },
-                            "index": 1
-                            }
-                        }
-                    }
-
                 }
-            ]
+            }
+
+            },
+            {"translation": {
+                "factors": [0, 0, 2.5],
+                "subject": {
+                    "halfSpace": {
+                        "position": [-2, 0, 0],
+                        "normal": [-2, 0, 0],
+                        "color": {
+                            "ambient": [1, 1, 1],
+                            "diffuse": [1, 1, 1],
+                            "specular": [1, 1, 1],
+                            "reflected": [1, 1, 1],
+                            "refracted": [1, 1, 1],
+                            "shininess": 1
+                        },
+                        "index": 1
+                    }
+                }
+            }
+
+            }
+        ]
         }
     ]
 }
