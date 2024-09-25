@@ -115,4 +115,8 @@ Vec3f skyColor(const Vec4f& d);
 
 Vec4f refractedDir(const float n, const float nt, const Vec4f& dir, const Vec4f& normal);
 
+bool isBlocked(const Vec4f& startPoint, const Vec4f& lightPos, World* scene, Object*& hitObject);
+
+struct Ray finalRefractedRay(Vec4f& T, Vec4f& enterPoint, Object* object);
+
 #endif // WORLD_HPP

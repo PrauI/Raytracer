@@ -80,6 +80,10 @@ public:
     Vec4f getPosition();
     Vec4f getObserver();
     int getDpi();
+
+    void posProcessing();
 };
+
+float sigmoid(const float x);
 
 #endif

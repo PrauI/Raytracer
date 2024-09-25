@@ -123,6 +123,8 @@ public:
      * @param closesHit Intersection information of the closest hit.
      */
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) = 0;
+
+    virtual Vec4f getNormal(const Vec4f& position) = 0;
 };
 
 /**
@@ -145,6 +147,8 @@ public:
      * @param input JSON value containing the radius.
      */
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+
+    virtual Vec4f getNormal(const Vec4f &position) override;
 };
 
 /**
@@ -179,6 +183,8 @@ public:
     * @brief Sets the default normal of the half-space.
     */
     void setDefaultNormal();
+
+    virtual Vec4f getNormal(const Vec4f &position) override;
 };
 
 /**

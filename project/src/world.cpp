@@ -159,6 +159,40 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
         if(!translation.isMember("subject")) throw std::runtime_error("No subject Provided for Translation");
         setupObjects(translation["subject"], matrix);
     }
+    else if(object.isMember("rotation")) {
+        Json::Value rotation = object["rotation"];
+        try {
+            if(!rotation.isMember("factors")) throw std::runtime_error("No Factors provided for Rotation");
+            Json::Value factors = rotation["factors"];
+            if(!factors.isArray() || factors.size() != 3) throw std::runtime_error("Provided Factors for Rotation are not in the correct Format");
+            float angleX = factors[0].asFloat();
+            float angleY = factors[1].asFloat();
+            float angleZ = factors[2].asFloat();
+            Mat rotationMatrixX = (cv::Mat_<float>(4,4) <<
+                                            1.0, 0.0, 0.0, 0.0,
+                                            0.0, cos(angleX), -sin(angleX), 0.0,
+                                            0.0, sin(angleX), cos(angleX), 0.0,
+                                            0.0, 0.0, 0.0, 1.0);
+            Mat rotatrionMatrixY = (cv::Mat_<float>(4,4) <<
+                                            cos(angleY), 0.0, sin(angleY), 0.0,
+                                            0.0, 1.0, 0.0, 0.0,
+                                            -sin(angleY), 0.0, cos(angleY), 0.0,
+                                            0.0, 0.0, 0.0, 1.0);
+            Mat rotationMatrixZ = (cv::Mat_<float>(4,4) <<
+                                            cos(angleZ), -sin(angleZ), 0.0, 0.0,
+                                            sin(angleZ), cos(angleZ), 0.0, 0.0,
+                                            0.0, 0.0, 1.0, 0.0,
+                                            0.0, 0.0, 0.0, 1.0);
+            matrix = rotationMatrixX * rotatrionMatrixY * rotationMatrixZ * matrix;
+
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+            std::cout << "Rendering proceeds without rotation" << std::endl;
+        }
+
+        if(!rotation.isMember("subject")) throw std::runtime_error("No subject Provided for Rotation");
+        setupObjects(rotation["subject"], matrix);
+    }
 
 }
 
@@ -247,30 +281,28 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
 
         // calculate if intersection point lays in shadow
         // calculate if ray between object and light is blocked by an object
-        bool inShadow = false;
         if(!light->isAmbient){
+            bool inShadow = false;
 
             Source* source = dynamic_cast<Source*>(light); // Light class muss in Source class umgewandelt werden, weil nur source eine getPosition funktion hat
-            Vec4f dir = source->getPosition() - info->position;
-            float dist = sqrt(dir.dot(dir));
-            cv::normalize(dir, dir);
-            struct Ray lightRay = {.dir = dir, .position = info->position};
-            intersectionInfo shadowHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
-            hit(lightRay, info->object, &shadowHit);
-            if(shadowHit.didHit && shadowHit.t < dist && shadowHit.t > 0) inShadow = true;
+
+            Object* hitObject = nullptr;
+            inShadow = isBlocked(info->position, source->getPosition(), this, hitObject);
+            if(!inShadow) {
+                Vec3f incomingColor = light->lightValue(info);
+                color = addLight(color, incomingColor);
+            }else if (inShadow && hitObject->getRefracted() != Vec3f(0.0)) {
+                Vec3f incomingColor = light->lightValue(info) * 0.5;
+                color = addLight(incomingColor, color);
+            }
         }
 
-        if(!inShadow){
-            Vec3f incomingColor = light->lightValue(info);
-            color = addLight(color, incomingColor);
-        }
         if(light->isAmbient){
             Vec3f incomingColor = light->lightValue(info);
             color = addLight(color, incomingColor);
         }
         // calculating the reflected light
-        if(currentBounce < maxBounce){
-
+        if(currentBounce < maxBounce) {
             // reflected
             float scalar = info->dir.dot(info->normal);
             Vec4f R = info->dir - 2*(scalar) * info->normal;
@@ -291,34 +323,25 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             color = addLight(color, rcolor);
 
             // refracted
-            float n = 1.0;
-            float nt = info->object->getIndex();
-            Vec4f T = refractedDir(n, nt, info->dir, info->normal);
-            intersectionInfo refractedHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
-            intersectionInfo selfCollision = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
-            struct Ray refractedRay = {.dir = T, .position = info->position + 0.00001 * T}; // multiplication to avoid intersection with startingpoint
+            if(info->object->getRefracted() != Vec3f(0.0)){
+                float n = 1.0;
+                float nt = info->object->getIndex();
+                Vec4f T = refractedDir(n, nt, info->dir, info->normal);
+                struct Ray refractedRay = finalRefractedRay(T, info->position, info->object);
 
-            // entering the object to calculate where it leaves
-            info->object->intersection(refractedRay, nullptr, &selfCollision);
-            if(!selfCollision.didHit) {
-                // it already left object
-
-            }else {
-                // it left object on the other side
-                Vec4f T = refractedDir(nt, n, refractedRay.dir, selfCollision.normal * -1);
-                refractedRay = {.dir = T, .position = refractedHit.position};
-            }
-            hit(refractedRay, info->object, &refractedHit);
-            Vec3f tcolor;
-            Vec3f Kt = info->object->getRefracted();
-            if(refractedHit.didHit && refractedHit.t > 0){
-                 tcolor = mixLight(&refractedHit, currentBounce + 1, maxBounce);
-                 for(int i = 0; i < 3; i++){ tcolor[i] = tcolor[i] * Kt[i] * 0.5; }
-             }else{
-                 Vec3f sky = skyColor(refractedRay.dir);
-                 for(int i = 0; i < 3 ; i++) tcolor[i] = sky[i] * Kt[i] * 0.5;
-             }
-             color = addLight(color, tcolor);
+                intersectionInfo refractedHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+                hit(refractedRay, info->object, &refractedHit);
+                Vec3f tcolor;
+                Vec3f Kt = info->object->getRefracted();
+                if(refractedHit.didHit && refractedHit.t > 0){
+                    tcolor = mixLight(&refractedHit, currentBounce + 1, maxBounce);
+                    for(int i = 0; i < 3; i++){ tcolor[i] = tcolor[i] * Kt[i] * 0.5; }
+                }else{
+                    Vec3f sky = skyColor(refractedRay.dir);
+                    for(int i = 0; i < 3 ; i++) tcolor[i] = sky[i] * Kt[i] * 0.5;
+                }
+                color = addLight(color, tcolor);
+        }
         }
         
         // color += incomingColor;
@@ -331,14 +354,41 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
     return color;
 }
 
+bool isBlocked(const Vec4f& startPoint, const Vec4f& lightPos, World* scene, Object*& hitObject) {
+    Vec4f dir = lightPos - startPoint;
+    float dist = sqrt(dir.dot(dir));
+    cv::normalize(dir, dir);
+    struct Ray lightRay = {.dir = dir, .position = startPoint + 0.00001 * dir}; /// + 0.0001 + dir ensures we are not colliding wiht the starting point
+    intersectionInfo shadowHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+    scene->hit(lightRay, nullptr, &shadowHit);
+    hitObject = shadowHit.object;
+    if(shadowHit.didHit &&shadowHit.t < dist && shadowHit.t > 0) return true;
+    return false;
+}
+
 Vec4f refractedDir(const float n, const float nt, const Vec4f& dir, const Vec4f& normal) {
     const float refractiveIndex = n / nt;
     float scalar = dir.dot(normal);
     Vec4f a = (scalar + sqrt(pow( 1 /refractiveIndex, 2) + pow(scalar, 2) - 1)) * normal;
     Vec4f T = dir - a;
-    T *= (-refractiveIndex);
+    T *= refractiveIndex;
     cv::normalize(T, T);
     return T;
+}
+
+struct Ray finalRefractedRay(Vec4f& T, Vec4f& enterPoint, Object* object){
+    intersectionInfo refractedHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+    intersectionInfo selfCollision = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+    struct Ray refractedRay = {.dir = T, .position = enterPoint + 0.00001 * T}; // multiplication to avoid intersection with startingpoint
+
+    // entering the object to calculate where it leaves
+    object->intersection(refractedRay, nullptr, &selfCollision); // we have to use nullptr because we want the collision on the other side of the object (if it has two sides)
+    if(!selfCollision.didHit) return refractedRay; // it allready left the object / the object has no opposite side
+
+    // it left object on the other side
+    Vec4f Tn = refractedDir(object->getIndex(), 1.0, refractedRay.dir, selfCollision.normal * -1);
+    refractedRay = {.dir = Tn, .position = selfCollision.position};
+    return refractedRay;
 }
 
 // Funktion zum addieren von Licht / Helligkeit

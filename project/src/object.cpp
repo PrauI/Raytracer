@@ -268,3 +268,12 @@ void normalizeTransformationMatrix(cv::Mat& transformationMatrix) {
     float length = std::sqrt(transformationDir.dot(transformationDir));
     transformationMatrix /= length;
 }
+
+Vec4f Sphere::getNormal(const Vec4f &position) {
+    return (position - getPosition()) / radius;
+}
+
+Vec4f Halfspace::getNormal(const Vec4f &position) {
+    (void) position;
+    return normal;
+}

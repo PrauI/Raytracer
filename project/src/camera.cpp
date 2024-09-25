@@ -115,13 +115,33 @@ Camera& Camera::operator=(Camera&& other) {
 }
 
 void Camera::capture(const string& filename){
-
+    // posProcessing();
     if(cv::imwrite(filename, matrix)) {
         cout << "Das Bild wurde erfolgreich als " << filename << " gespeichert." << endl;
     }
     else{
         cout << "Fehler beim Speichern des Bildes." << endl;
     }
+}
+
+void Camera::posProcessing() {
+
+    cv::Scalar mean = cv::mean(matrix);
+    float brigthness = 0;
+    for(int i = 0; i < 3; i++) brigthness += mean[i];
+    brigthness /= 3;
+    cout << "Brightness: " << brigthness << endl;
+    float factor = 175 / brigthness;
+    cv::multiply(matrix, factor, matrix);
+    mean = cv::mean(matrix);
+    brigthness = 0;
+    for (int i = 0; i < 3; i++) brigthness += mean[i];
+    brigthness /= 3;
+    cout << "Brightness: " << brigthness << endl;
+}
+
+float sigmoid(const float x) {
+    return 1 / (1 + exp(-x)) - 0.5;
 }
 
 Vec4f Camera::getPosition(){
