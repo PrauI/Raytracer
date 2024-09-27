@@ -12,13 +12,14 @@ void Combination::addObject(Object* object){
 }
 
 void Union::intersection(const Ray& ray, World* scene, intersectionInfo* closestHit){
-    intersectionInfo hit;
-    hit.didHit = false;
+    struct intersectionInfo unionHit;
+     unionHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
+
     for(auto object : objects){
-        object->intersection(ray, scene, &hit);
-        if(hit.didHit){
-            if(!closestHit->didHit || hit.t < closestHit->t){
-                *closestHit = hit;
+        object->intersection(ray, scene, &unionHit);
+        if(unionHit.didHit){
+            if(!closestHit->didHit || unionHit.t < closestHit->t){
+                *closestHit = unionHit;
             }
         }
     }

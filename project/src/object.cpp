@@ -230,7 +230,6 @@ Halfspace::Halfspace(Json::Value& input, Mat& matrix){
 }
 
 void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit){
-
     Mat resultD = transformationMatrix * ray.dir;
     Vec4f dm = resultD;
     Mat resultS = transformationMatrix * ray.position;

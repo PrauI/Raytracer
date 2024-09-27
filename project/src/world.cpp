@@ -269,6 +269,7 @@ void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
 
         Vec3f color = {1.0,0.7,0.5};
         if(closestHit.didHit) color = mixLight(&closestHit, 0, 2);
+
         else color = skyColor(ray.dir);
         row_ptr[x] = map255(color);
     }
