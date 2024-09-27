@@ -1,13 +1,14 @@
 #ifndef OBJECT_HPP
 #define OBJECT_HPP
 #include <json/json.h>
-#include <vector>
 #include <opencv2/opencv.hpp>
 #include "world.hpp"
+#include "combination.hpp"
 
 using cv::Vec4f, cv::Vec3b, cv::Vec3f, cv::Mat;
 
 class World;
+class Combination;
 
 #define Origin  Vec4f(0,0,0,1);
 #define EPSILON 0.00001;
@@ -40,6 +41,7 @@ protected:
     Vec3f refracted;  /**< Refracted color of the object. */
     float shininess;  /**< Shininess of the object. */
     float index;        /**< Index of refraction / reflection of the object. */
+
 
 
 public:
@@ -185,6 +187,15 @@ public:
     void setDefaultNormal();
 
     virtual Vec4f getNormal(const Vec4f &position) override;
+};
+
+class CombinationWrapper: public Object {
+private:
+public:
+    Combination* combination;
+    CombinationWrapper(Combination* combination);
+    virtual Vec4f getNormal(const Vec4f &position);
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
 };
 
 /**

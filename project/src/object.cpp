@@ -277,3 +277,27 @@ Vec4f Halfspace::getNormal(const Vec4f &position) {
     (void) position;
     return normal;
 }
+
+CombinationWrapper::CombinationWrapper(Combination *combination) : combination(combination) {
+        setDefaultPosition();
+        setDefaultColor();
+}
+
+Vec4f CombinationWrapper::getNormal(const Vec4f &position) {
+    // todo check what object has been at position and return its normal
+    return Vec4f(0.0);
+}
+
+
+
+
+void CombinationWrapper::intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) {
+    if(combination != nullptr) combination->intersection(ray, scene, closesHit);
+    else {
+        std::cout << "No combination set" << std::endl;
+        closesHit->didHit = false;
+    }
+}
+
+
+

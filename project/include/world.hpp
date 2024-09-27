@@ -57,7 +57,7 @@ public:
     * @param object JSON value containing the object parameters.
     * @param matrix Transformation matrix.
     */
-    void setupObjects(Json::Value& object, Mat& matrix);
+    Object* setupObjects(Json::Value& object, Mat& matrix);
 
     /**
      * @brief shoots a ray for every pixel of the image and calculates the color

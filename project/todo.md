@@ -7,7 +7,7 @@
 - [ ] refracted light
 - [x] translation
 - [x] scaling
-- [ ] rotation
+- [x] rotation
 - [ ] in main.cpp calcMatrix und createImage zusammenfassen 
 - [x] in code descriptions
 - [ ] alle todos in code abarbeiten

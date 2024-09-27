@@ -8,6 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <limits>
 #include <thread>
+#include <combination.hpp>
 #define INFINITY std::numeric_limits<float>::infinity()
 
 using std::cout, std::endl, cv::Mat;
@@ -95,7 +96,7 @@ void World::readObjects(Json::Value& objects){
                                             0.0, 0.0, 0.0, 1.0);
             // for every transformation done to an object we go deeper in the json file,
             // until we get to the subject, in which case we break out of the loop.
-            setupObjects(object, matrix);
+            objectList.push_back(setupObjects(object, matrix));
         }
 
     } catch (const std::exception& e) {
@@ -105,18 +106,35 @@ void World::readObjects(Json::Value& objects){
     }
 }
 
-void World::setupObjects(Json::Value& object, Mat& matrix){
+Object* World::setupObjects(Json::Value& object, Mat& matrix){
     Object* finalObject = nullptr;
     // da muss noch irgendwie die matrix mit rein
     if(object.isMember("sphere")) {
         finalObject = new Sphere(object["sphere"], matrix);
-        objectList.push_back(finalObject);
+        return finalObject;
     }
     else if(object.isMember("halfSpace")){
         finalObject = new Halfspace(object["halfSpace"], matrix);
-        objectList.push_back(finalObject);
+        return finalObject;
     }
-    else if(object.isMember("union")) return; // todo
+    else if(object.isMember("union")) {
+        Json::Value junion = object["union"];
+        try {
+            auto* unionObject = new Union();
+            if(!junion.isArray()) throw std::runtime_error("Union not in correct format");
+            if(junion.size() == 0) throw std::runtime_error("No objects in Union");
+            for(int i = 0; i < junion.size(); i++) {
+                unionObject->addObject(setupObjects(junion[i], matrix));
+            }
+            finalObject = new CombinationWrapper(unionObject);
+
+            return finalObject;
+
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+            std::cout << "Rendering proceeds without union" << std::endl;
+        }
+    }
     else if(object.isMember("scaling")){
         Json::Value scaling = object["scaling"];
         try{
@@ -134,7 +152,7 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
             cout << "Rendering proceeds without scaling" << endl;
         }
         if(!scaling.isMember("subject")) throw std::runtime_error("No subject Provided for Scaling");
-        setupObjects(scaling["subject"], matrix);
+        return setupObjects(scaling["subject"], matrix);
     }
     else if(object.isMember("translation")){
         Json::Value translation = object["translation"];
@@ -157,7 +175,7 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
         }
         
         if(!translation.isMember("subject")) throw std::runtime_error("No subject Provided for Translation");
-        setupObjects(translation["subject"], matrix);
+        return setupObjects(translation["subject"], matrix);
     }
     else if(object.isMember("rotation")) {
         Json::Value rotation = object["rotation"];
@@ -191,7 +209,7 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
         }
 
         if(!rotation.isMember("subject")) throw std::runtime_error("No subject Provided for Rotation");
-        setupObjects(rotation["subject"], matrix);
+        return setupObjects(rotation["subject"], matrix);
     }
 
 }
