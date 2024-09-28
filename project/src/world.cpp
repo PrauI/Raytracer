@@ -152,6 +152,23 @@ Object* World::setupObjects(Json::Value& object, Mat& matrix){
             std::cerr << e.what() << std::endl;
             std::cout << "Rendering proceeds without intersection" << std::endl;
         }
+    }else if(object.isMember("exclusion")) {
+        Json::Value jexclusion = object["exclusion"];
+        try {
+            auto* exclusionObject = new Exclusion();
+            if(!jexclusion.isArray()) throw std::runtime_error("Exclusion not in correct format");
+            if(jexclusion.size() == 0) throw std::runtime_error("No objects in exclusion");
+            for(int i = 0; i < jexclusion.size(); i++) {
+                exclusionObject->addObject(setupObjects(jexclusion[i], matrix));
+            }
+            finalObject = new CombinationWrapper(exclusionObject);
+
+            return finalObject;
+
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+            std::cout << "Rendering proceeds without exclusion" << std::endl;
+        }
     }
     else if(object.isMember("scaling")){
         Json::Value scaling = object["scaling"];
