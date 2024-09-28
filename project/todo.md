@@ -12,17 +12,17 @@
 - [x] in code descriptions
 - [ ] alle todos in code abarbeiten
 - [x] Philipp: sphere default color method / function
-  - [ ] add to sphere and halfspace constructor
+  - [x] add to sphere and halfspace constructor
 - [x] unionize objects and add to world::setupObjects
 - [ ] try catch in Object::setColor
 - [ ] todo in Halfspace::intersection
-- [ ] world:readObjects in try catch umwandeln
-- [ ] evtl todo: himmelsfarbe ändern, basierend auf höhe / winkel des strahls
-- [ ] der todo in world::mixlight
+- [x] world:readObjects in try catch umwandeln
+- [x] evtl todo: himmelsfarbe ändern, basierend auf höhe / winkel des strahls
+- [x] der todo in world::mixlight
 - [ ] document or code in a markdown file and do the readme stuff expected by the professor
     - [ ] usage description
     - [ ] ULM diagram
-    - [ ] installation guide
+    - [x] installation guide
     - [ ] documentation of how the program works
 - [ ] get rid of the warnings
 - [x] replace all scalarProduct() with the opencv dotproduct function
