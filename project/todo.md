@@ -13,7 +13,7 @@
 - [ ] alle todos in code abarbeiten
 - [x] Philipp: sphere default color method / function
   - [ ] add to sphere and halfspace constructor
-- [ ] unionize objects and add to world::setupObjects
+- [x] unionize objects and add to world::setupObjects
 - [ ] try catch in Object::setColor
 - [ ] todo in Halfspace::intersection
 - [ ] world:readObjects in try catch umwandeln
