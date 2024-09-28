@@ -31,6 +31,8 @@
 - [ ] testing
   - [ ] more tests
   - [ ] solve exisitng test which doesnt work
+- [ ] rausfinden was mit index in ambient in der json gemeint ist
+- [ ] das recursion aus der json einfügen
 
 ## additional features
 we have to implement at least two additional features. some ideas:
