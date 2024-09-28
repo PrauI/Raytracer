@@ -308,9 +308,7 @@ void CombinationWrapper::intersection(const struct Ray& ray, World* scene, inter
 }
 
 bool CombinationWrapper::isIncluded(const Vec4f &point) {
-    // todo !!
-    (void) point;
-    return false;
+    return combination->isIncluded(point);
 }
 
 

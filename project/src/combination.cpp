@@ -24,39 +24,15 @@ void Union::intersection(const Ray& ray, World* scene, intersectionInfo* closest
         }
     }
 }
-/**
-void Intersection::intersection(const Ray& ray, World* scene, intersectionInfo* closestHit){
-    struct intersectionInfo intersectionHit;
 
-    // it only saves the intersection info in closestHit if it hits all objects of the intersection
-    for(auto object : objects){
-        intersectionHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
-        object->intersection(ray, scene, &intersectionHit);
+bool Union::isIncluded(const Vec4f &point) {
 
-        if(!intersectionHit.didHit) continue;
-
-        if(objects.size() == 1){
-            *closestHit = intersectionHit;
-            break;
-        }
-
-        for(auto other : objects) {
-
-            if(other == object ) continue;
-
-            if(other->isIncluded(intersectionHit.position)){
-                if(!closestHit->didHit || intersectionHit.t < closestHit->t) {
-                    *closestHit = intersectionHit;
-                }
-            }else {
-                intersectionHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
-                *closestHit = intersectionHit;
-                break;
-            }
-        }
+    for(auto object: objects) {
+        if(object->isIncluded(point)) return true;
     }
+    return false;
+}
 
-} */
 
 void Intersection::intersection(const Ray& ray, World* scene, intersectionInfo* closestHit){
     std::vector<intersectionInfo> intersectionHits;
@@ -88,6 +64,13 @@ void Intersection::intersection(const Ray& ray, World* scene, intersectionInfo* 
     }
 }
 
+bool Intersection::isIncluded(const Vec4f &point) {
+    for(auto object: objects) {
+        if(!object->isIncluded(point)) return false;
+    }
+    return true;
+}
+
 
 void Exclusion::intersection(const Ray& ray, World* scene, intersectionInfo* closestHit){
     std::vector<intersectionInfo> intersectionHits;
@@ -117,4 +100,12 @@ void Exclusion::intersection(const Ray& ray, World* scene, intersectionInfo* clo
             }
         }
     }
+}
+
+bool Exclusion::isIncluded(const Vec4f &point) {
+    int isIn = 0;
+    for(auto object: objects) {
+        if(object->isIncluded(point)) isIn++;
+    }
+    return isIn == 1;
 }
