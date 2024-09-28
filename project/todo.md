@@ -10,12 +10,12 @@
 - [x] rotation
 - [ ] in main.cpp calcMatrix und createImage zusammenfassen 
 - [x] in code descriptions
-- [ ] alle todos in code abarbeiten
+- [x] alle todos in code abarbeiten
 - [x] Philipp: sphere default color method / function
   - [x] add to sphere and halfspace constructor
 - [x] unionize objects and add to world::setupObjects
 - [ ] try catch in Object::setColor
-- [ ] todo in Halfspace::intersection
+- [x] todo in Halfspace::intersection
 - [x] world:readObjects in try catch umwandeln
 - [x] evtl todo: himmelsfarbe ändern, basierend auf höhe / winkel des strahls
 - [x] der todo in world::mixlight
