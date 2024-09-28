@@ -160,10 +160,19 @@ void Sphere::intersection(const struct Ray& ray, World* scene, intersectionInfo*
 
 }
 
+bool Sphere::isIncluded(const Vec4f &point) {
+    return pow(point[0] - position[0], 2) + pow(point[1] - position[1], 2) + pow(point[2] - position[2], 2) <= pow(radius, 2) + 0.0001;
+}
+
 float length(Vec4f& x){
     return sqrt(pow(x[0],2) + pow(x[1], 2) + pow(x[2], 2) + pow(x[3], 2));
 }
 
+
+bool Halfspace::isIncluded(const Vec4f &point) {
+    Vec4f dirToPos = point - getPosition();
+    return dirToPos.dot(normal) == 0;
+}
 
 
 void Halfspace::setNormal(Json::Value& input){
@@ -296,6 +305,12 @@ void CombinationWrapper::intersection(const struct Ray& ray, World* scene, inter
         std::cout << "No combination set" << std::endl;
         closesHit->didHit = false;
     }
+}
+
+bool CombinationWrapper::isIncluded(const Vec4f &point) {
+    // todo !!
+    (void) point;
+    return false;
 }
 
 

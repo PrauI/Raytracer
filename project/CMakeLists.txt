@@ -20,6 +20,7 @@ else ()
     # Erstelle die ausführbare Datei
     add_executable(Raytracer ${SOURCES})
 
+    # Füge die Bibliotheken hinzu
     # Json cpp
     find_package(jsoncpp REQUIRED)  # Sucht nach JsonCpp
     target_link_libraries(Raytracer PRIVATE jsoncpp_lib)  # Fügt JsonCpp hinzu

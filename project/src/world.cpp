@@ -135,6 +135,24 @@ Object* World::setupObjects(Json::Value& object, Mat& matrix){
             std::cout << "Rendering proceeds without union" << std::endl;
         }
     }
+    else if(object.isMember("intersection")) {
+        Json::Value jintersection = object["intersection"];
+        try {
+            auto* intersectionObject = new Intersection();
+            if(!jintersection.isArray()) throw std::runtime_error("Intersection not in correct format");
+            if(jintersection.size() == 0) throw std::runtime_error("No objects in intersection");
+            for(int i = 0; i < jintersection.size(); i++) {
+                intersectionObject->addObject(setupObjects(jintersection[i], matrix));
+            }
+            finalObject = new CombinationWrapper(intersectionObject);
+
+            return finalObject;
+
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+            std::cout << "Rendering proceeds without intersection" << std::endl;
+        }
+    }
     else if(object.isMember("scaling")){
         Json::Value scaling = object["scaling"];
         try{

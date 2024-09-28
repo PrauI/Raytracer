@@ -127,6 +127,8 @@ public:
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) = 0;
 
     virtual Vec4f getNormal(const Vec4f& position) = 0;
+
+    virtual bool isIncluded(const Vec4f& point) = 0;
 };
 
 /**
@@ -151,6 +153,8 @@ public:
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
 
     virtual Vec4f getNormal(const Vec4f &position) override;
+
+    virtual bool isIncluded(const Vec4f& point) override;
 };
 
 /**
@@ -181,6 +185,8 @@ public:
      */
     void setNormal(Json::Value& input);
 
+    virtual bool isIncluded(const Vec4f& point) override;
+
     /**
     * @brief Sets the default normal of the half-space.
     */
@@ -196,6 +202,7 @@ public:
     CombinationWrapper(Combination* combination);
     virtual Vec4f getNormal(const Vec4f &position);
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+    virtual bool isIncluded(const Vec4f &point);
 };
 
 /**

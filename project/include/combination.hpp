@@ -31,6 +31,11 @@ public:
     void intersection(const Ray& ray, World* scene, intersectionInfo* closesHit) override;
 };
 
+class Intersection : public Combination{
+public:
+    void intersection(const Ray& ray, World* scene, intersectionInfo* closesHit) override;
+};
+
 
 
 #endif //COMBINATION_H
