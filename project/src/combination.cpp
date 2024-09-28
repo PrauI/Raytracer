@@ -109,3 +109,12 @@ bool Exclusion::isIncluded(const Vec4f &point) {
     }
     return isIn == 1;
 }
+
+Vec4f Combination::getNormal(const Vec4f &position) {
+    if(objects.empty()) return Vec4f(0.0);
+    for(auto object : objects){
+        Vec4f normal = object->getNormal(position);
+        if(normal != Vec4f(0.0)) return normal;
+    }
+    return Vec4f(0.0);
+}

@@ -277,13 +277,20 @@ void normalizeTransformationMatrix(cv::Mat& transformationMatrix) {
     transformationMatrix /= length;
 }
 
-Vec4f Sphere::getNormal(const Vec4f &position) {
-    return (position - getPosition()) / radius;
+Vec4f Sphere::getNormal(const Vec4f &point) {
+    const float epsilon = 0.0001;
+    float squaredDistance = pow(point[0] - position[0], 2) + pow(point[1] - position[1], 2) + pow(point[2] - position[2], 2);
+    if(squaredDistance >= pow(radius, 2) - epsilon && squaredDistance <= pow(radius, 2) + epsilon) {
+        // the point exists on the sphere surface
+        return (point - getPosition()) / radius;
+    }
+    return Vec4f(0.0);
 }
 
 Vec4f Halfspace::getNormal(const Vec4f &position) {
-    (void) position;
-    return normal;
+    // check if point is on plane
+    if(normal.dot(position - getPosition()) == 0) return normal;
+    return Vec4f(0.0);
 }
 
 CombinationWrapper::CombinationWrapper(Combination *combination) : combination(combination) {
@@ -292,8 +299,8 @@ CombinationWrapper::CombinationWrapper(Combination *combination) : combination(c
 }
 
 Vec4f CombinationWrapper::getNormal(const Vec4f &position) {
-    // todo check what object has been at position and return its normal
-    return Vec4f(0.0);
+
+    combination->getNormal(position);
 }
 
 

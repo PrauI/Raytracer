@@ -23,6 +23,7 @@ public:
     void addObject(Object* object);
     virtual void intersection(const Ray& ray, World* scene, intersectionInfo* closesHit) = 0;
     virtual bool isIncluded(const Vec4f& point);
+    Vec4f getNormal(const Vec4f &position);
 
 };
 
