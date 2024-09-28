@@ -116,12 +116,10 @@ Camera& Camera::operator=(Camera&& other) {
 
 void Camera::capture(const string& filename){
     // posProcessing();
-    if(cv::imwrite(filename, matrix)) {
-        cout << "Das Bild wurde erfolgreich als " << filename << " gespeichert." << endl;
-    }
-    else{
-        cout << "Fehler beim Speichern des Bildes." << endl;
-    }
+    if(cv::imwrite(filename, matrix)) cout << "Das Bild wurde erfolgreich als " << filename << " gespeichert." << endl;
+
+    else cout << "Fehler beim Speichern des Bildes." << endl;
+
 }
 
 void Camera::posProcessing() {
