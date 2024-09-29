@@ -24,6 +24,7 @@ class World {
 public:
     Camera camera; /**< Camera object in the world. */
     World();
+    
 
     /**
      * @brief Reads the world configuration from a file.

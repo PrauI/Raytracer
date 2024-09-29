@@ -99,7 +99,7 @@ void Object::setDefaultColor() {
 
 void Object::setColor(Json::Value& color){
     // todo try catch
-
+    try{
     for(int i = 0; i < 3; i++){
         ambient[i] = color["ambient"][i].asFloat();
         diffuse[i] = color["diffuse"][i].asFloat();
@@ -108,6 +108,9 @@ void Object::setColor(Json::Value& color){
         refracted[i] = color["refracted"][i].asFloat();
     }
     shininess = color["shininess"].asFloat();
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+    }
 }
 
 void Object::setIndex(Json::Value& Jindex){
