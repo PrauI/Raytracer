@@ -1,5 +1,6 @@
 if(EXISTS "${CMAKE_SOURCE_DIR}/CMakeLists.local.txt")
     include("${CMAKE_SOURCE_DIR}/CMakeLists.local.txt")
+
 else ()
 
     cmake_minimum_required(VERSION 3.10)

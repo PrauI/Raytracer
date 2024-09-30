@@ -1,0 +1,204 @@
+{
+    "screen": {
+        "dpi": 300,
+        "dimensions": [2, 4],
+        "position": [-1, -2, -10],
+        "observer": [0, 0, -14]
+    },
+
+    "medium": {
+        "ambient": [0.1, 0.1, 0.1],
+        "index": 1,
+        "recursion": 1
+    },
+
+    "sources": [
+        {
+            "position": [50, 60, -20],
+            "intensity": [0.4, 0.5, 0.5]
+        },
+        {
+            "position": [1, 0, 0],
+            "intensity": [0.1, 0.0, 0.0]
+        },
+        {
+            "position": [0, 1, 0],
+            "intensity": [0.0, 0.1, 0.0]
+        },
+        {
+            "position": [2, 5, 20],
+            "intensity": [0.0, 0.0, 0.1]
+        }
+    ],
+
+    "objects": [
+        {
+            "rotation": {
+                "factors": [0,0,0],
+            "subject": {
+            "sphere": {
+                "position": [
+                    1,
+                    -1,
+                    -1
+                ],
+                "radius": 1.5,
+                "color": {
+                    "ambient": [
+                        0,0,0
+                    ],
+                    "diffuse": [
+                        0.1,0.1,0.1
+                    ],
+                    "specular": [
+                        0.6,
+                        0.6,
+                        0.6
+                    ],
+                    "reflected": [
+                        0.8,0.8,0.8
+                    ],
+                    "refracted": [
+                        0,0,0
+                    ],
+                    "shininess": 1
+                },
+                "index": 1.5
+            }
+        }
+        }
+    },
+        {
+            "halfSpace": {
+                "position": [
+                    -2,
+                    0,
+                    0
+                ],
+                "normal": [
+                    1,
+                    0,
+                    0
+                ],
+                "color": {
+                    "ambient": [
+                        1,
+                        1,
+                        1
+                    ],
+                    "diffuse": [
+                        1,
+                        1,
+                        1
+                    ],
+                    "specular": [
+                        1,
+                        1,
+                        1
+                    ],
+                    "reflected": [
+                        0.1,
+                        0.1,
+                        0.1
+                    ],
+                    "refracted": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "shininess": 1,
+                    "texture": {
+                        "filename": "assets/stone.jpg",
+                        "size": 4
+                    }
+                },
+                "index": 1.5
+            }
+        },
+        {
+            "halfSpace": {
+                "position": [
+                    -2,
+                    -10,
+                    0
+                ],
+                "normal": [
+                    0,
+                    1,
+                    0
+                ],
+                "color": {
+                    "ambient": [
+                        1,
+                        1,
+                        1
+                    ],
+                    "diffuse": [
+                        0.3, 0.4, 0.7
+                    ],
+                    "specular": [
+                        0.3, 0.3, 0.7
+                    ],
+                    "reflected": [
+                        0,0,0
+                    ],
+                    "refracted": [
+                        0,0,0
+                    ],
+                    "shininess": 1,
+                    "texture": {
+                        "filename": "assets/cross.jpg",
+                        "size": 2
+                    }
+                },
+                "index": 1.5
+            }
+        },
+        {
+            "sphere": {
+                "position": [2, 2, 5],
+                "radius": 5.0,
+                "color": {
+                    "ambient": [1, 1, 1],
+                    "diffuse": [0.1, 0.1, 0.1],
+                    "specular": [1, 1, 1],
+                    "reflected": [0.0, 0, 0],
+                    "refracted": [0.8, 0.8, 0.8],
+                    "shininess": 1
+                },
+                "index": 1
+            }
+        },
+        {
+            "sphere": {
+                "position": [1, 4, -2],
+                "radius": 1,
+                "color": {
+                    "ambient": [1, 1, 1],
+                    "diffuse": [0.1, 0.1, 0.1],
+                    "specular": [1, 1, 1],
+                    "reflected": [0,0,0],
+                    "refracted": [0.8,0.8,0.8],
+                    "shininess": 1
+                },
+                "index": 1.2
+            }
+        }, {
+            "sphere": {
+                "position": [1.5, 2.5, 15],
+                "radius": 3,
+                "color": {
+                    "ambient": [1, 1, 1],
+                    "diffuse": [0.9, 0.1, 0.5],
+                    "specular": [1, 1, 1],
+                    "reflected": [0,0,0],
+                    "refracted": [0,0,0],
+                    "shininess": 1
+                },
+                "index": 1
+            }
+        }
+
+
+    ]
+}

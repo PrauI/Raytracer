@@ -22,7 +22,7 @@ protected:
 public:
     void addObject(Object* object);
     virtual void intersection(const Ray& ray, World* scene, intersectionInfo* closesHit) = 0;
-    virtual bool isIncluded(const Vec4f& point);
+    virtual bool isIncluded(const Vec4f& point) = 0;
     Vec4f getNormal(const Vec4f &position);
 
 };
@@ -30,20 +30,20 @@ public:
 class Union : public Combination{
 public:
     void intersection(const Ray& ray, World* scene, intersectionInfo* closesHit) override;
-    virtual bool isIncluded(const Vec4f& point) override;
+    bool isIncluded(const Vec4f& point) override;
 };
 
 class Intersection : public Combination{
 public:
     void intersection(const Ray& ray, World* scene, intersectionInfo* closesHit) override;
-    virtual bool isIncluded(const Vec4f& point) override;
+    bool isIncluded(const Vec4f& point) override;
 
 };
 
 class Exclusion : public Combination{
 public:
     void intersection(const Ray& ray, World* scene, intersectionInfo* closesHit) override;
-    virtual bool isIncluded(const Vec4f& point) override;
+    bool isIncluded(const Vec4f& point) override;
 
 };
 

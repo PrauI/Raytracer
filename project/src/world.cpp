@@ -326,6 +326,14 @@ Vec3b map255(const Vec3f& color){
     return rgb;
 }
 
+Vec3f map01(const Vec3b& color) {
+    Vec3f rgb;
+    for(int i = 0; i < 3; i++) {
+        rgb[i] = color[i] / 255.0;
+    }
+    return rgb;
+}
+
 // Calculates Color / Light at a certain intersection point 
 // based on all the lights in the scene
 Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce){
@@ -380,7 +388,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             if(info->object->getRefracted() != Vec3f(0.0)){
                 float n = 1.0;
                 float nt = info->object->getIndex();
-                Vec4f T = refractedDir(n, nt, R, info->normal);
+                Vec4f T = refractedDir(n, nt, -info->dir, info->normal);
                 struct Ray refractedRay = finalRefractedRay(T, info->position, info->object);
 
                 intersectionInfo refractedHit = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
@@ -423,14 +431,14 @@ bool isBlocked(const Vec4f& startPoint, const Vec4f& lightPos, World* scene, Obj
 Vec4f refractedDir(const float n, const float nt, const Vec4f& dir, const Vec4f& normal) {
     const float refractiveIndex = n / nt;
 
-    Vec4f T = refractiveIndex * (dir - dir.dot(normal) * normal) - normal * sqrt(1 - refractiveIndex * refractiveIndex * (1 - dir.dot(normal) * dir.dot(normal)));
+    Vec4f T = refractiveIndex * (dir - (dir.dot(normal) + sqrt((1/refractiveIndex) * (1/refractiveIndex) + dir.dot(normal) * dir.dot(normal) - 1) ) * normal);
     cv::normalize(T, T);
     return T;
 }
 
 struct Ray finalRefractedRay(Vec4f& T, Vec4f& enterPoint, Object* object){
     intersectionInfo selfCollision = {.didHit = false, .t = INFINITY, .position = Vec4f(0.0), .normal = Vec4f(0.0), .dir = Vec4f(0.0), .object = nullptr};
-    struct Ray refractedRay = {.dir = T, .position = enterPoint + 0.001 * T}; // multiplication to avoid intersection with startingpoint
+    struct Ray refractedRay = {.dir = T, .position = enterPoint + 0.01 * T}; // multiplication to avoid intersection with startingpoint
 
     // entering the object to calculate where it leaves
     object->intersection(refractedRay, nullptr, &selfCollision); // we have to use nullptr because we want the collision on the other side of the object (if it has two sides)
