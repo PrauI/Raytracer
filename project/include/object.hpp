@@ -181,6 +181,25 @@ public:
     void setDefaultNormal();
 };
 
+class Triangle: public Object{
+private:
+
+public:
+   /**
+    * @brief Constructs a Halfspace object from JSON input and transformation matrix.
+    * @param input JSON value containing the half-space parameters.
+    * @param matrix Transformation matrix.
+    */
+    Triangle(Json::Value& input, Mat& matrix);
+
+ /**
+     * @brief Calculates the intersection of a ray with the half-space.
+     * @param ray Ray to intersect with the half-space.
+     * @param scene Scene containing the half-space.
+     * @param closesHit Intersection information of the closest hit.
+     */
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+}
 /**
  * @brief Calculates the length of a vector.
  * @param x Vector whose length is to be calculated.
