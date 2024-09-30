@@ -18,10 +18,18 @@ int main(int argc, char **argv) {
     auto start = std::chrono::high_resolution_clock::now();
     World world;
 
+    int numThreads = NUM_THREADS;
+
     // Festlegen des Dateinamens fpr das zu speichernde Bild
     if(argc < 3) {
         std::cerr << "Usage: " << argv[0] << " <output-filename>.png <input-filename>.json" << std::endl;
         return 1;
+    }else if(argc > 3) {
+        for(int i = 3; i < argc; i++){
+            if(std::string(argv[i]) == "--threads" && i+1 < argc) {
+                numThreads = std::stoi(argv[i+1]);
+            }
+        }
     }
     std::string filename = argv[1];
 
@@ -38,11 +46,11 @@ int main(int argc, char **argv) {
     auto startCalc = std::chrono::high_resolution_clock::now();
     // start Multithreading
 
-    std::cout << "Threads used: " << NUM_THREADS << std::endl;
+    std::cout << "Threads used: " << numThreads << std::endl;
 
-    if(NUM_THREADS > 1){
+    if(numThreads > 1){
 
-        world.processMatrix(NUM_THREADS);
+        world.processMatrix(numThreads);
 
     }else{
         int blockSize = world.camera.matrix.cols + 1;

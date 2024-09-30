@@ -185,3 +185,16 @@ To combine objects into a single entity, use the union operator. This allows you
     ]
 }
 ```
+to add a texture simply insert the following somewhere in the color propertie. Textures are only supportet by spheres and halfspaces and distort the normal vector of the object.
+therefore they have an influence on shadows, reflections and refractions.
+```json
+{
+  "texture": {
+    "filename": "path/to/texture.jpg/.png"
+    "size": 1
+  }
+}
+```
+
+<img src="assets/cross.jpg" width="200px">
+<em>cross.jpg</em>
