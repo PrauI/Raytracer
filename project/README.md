@@ -18,6 +18,7 @@ By Zeynep Tosun, Pascal Hollinger and Philipp Rauser
 - [How to render your own scene](#how-to-render-your-own-scene)
 - [installation guide](markdown/installation.md)
 - [description of the code](markdown/code_description.md)
+- [automatic testing](#running-automatic-tests)
 
 ---
 
@@ -92,6 +93,8 @@ Feel free to combine these transformations (rotation, transformation and scaling
 
 Merging Objects
 To combine objects into a single entity, use the union operator. This allows you to create complex shapes by merging multiple objects together. (union, intersection, exclusion) 
+
+If you need more inspiration you can have a look into markdown/assets/jsons for more examples.
 ```json
 {
     "screen": {
@@ -198,3 +201,11 @@ therefore they have an influence on shadows, reflections and refractions.
 
 <img src="assets/cross.jpg" width="200px">
 <em>cross.jpg</em>
+
+### Running automatic tests
+
+To run automatic tests or a list of inputs, you can put the json files in the ```test/inputs/``` directory and run the following command:
+```bash
+python test/test.py
+```
+Please make sure you have python installed on your system and there exists a ```test/outputs/``` directory in which the generated images can be saved.
