@@ -101,7 +101,17 @@ void Object::setDefaultColor() {
 
 void Object::setColor(Json::Value& color){
     // todo try catch
-
+    try{
+        if(!color.isMember("ambient"))  throw std::runtime_eroor("No ambient color provided");
+        if(!color.isMember("diffuse"))  throw std::runtime_eroor("No diffuse color provided");
+        if(!color.isMember("specular"))  throw std::runtime_eroor("No specular color provided");
+        if(!color.isMember("reflected"))  throw std::runtime_eroor("No reflected color provided");
+        if(!color.isMember("refraction"))  throw std::runtime_eroor("No refracted color provided");
+        if(!color["ambient"].isArray() || input color["ambient"].size() != 3) throw std::runtime_error("No correct format given for ambient");
+        if(!color["diffuse"].isArray() || input color["diffuse"].size() != 3) throw std::runtime_error("No correct format given for diffuse");
+        if(!color["specular"].isArray() || input color["specular"].size() != 3) throw std::runtime_error("No correct format given for specular");
+        if(!color["reflected"].isArray() || input color["reflected"].size() != 3) throw std::runtime_error("No correct format given for reflected");
+        if(!color["refracted"].isArray() || input color["refracted"].size() != 3) throw std::runtime_error("No correct format given for refracted");
     for(int i = 0; i < 3; i++){
         ambient[i] = color["ambient"][i].asFloat();
         diffuse[i] = color["diffuse"][i].asFloat();
@@ -110,9 +120,10 @@ void Object::setColor(Json::Value& color){
         refracted[i] = color["refracted"][i].asFloat();
     }
     shininess = color["shininess"].asFloat();
-
-    if(color.isMember("texture")) {
-        texture = std::make_shared<Texture>(color["texture"]);
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+        cout << "Proceeding with default colors" << endl;
+        setDefaultColor();
     }
 }
 
