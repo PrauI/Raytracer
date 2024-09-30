@@ -9,20 +9,18 @@ using std::endl;
 
 Ambient::Ambient(Json::Value& medium){
     isAmbient = true;
-    if(medium.isMember("ambient")){
-        const Json::Value ambient = medium["ambient"];
-        if(ambient.isArray() && ambient.size() == 3){
-            intensity[0] = ambient[0].asFloat();
-            intensity[1] = ambient[1].asFloat();
-            intensity[2] = ambient[2].asFloat();
 
-            cout << "Ambient Light: " << intensity[0] << " " << intensity[1] << " " << intensity[2] << endl;
-        }else{
-            // default werte und fehler behandlung
-        }
-
-    }else{
-        // irgend einen default setten und ausgabe machen
+    try {
+        if(!medium.isMember("ambient")) throw std::runtime_error("No ambient provided in medium");
+        Json::Value ambient = medium["ambient"];
+        if (!ambient.isArray() || ambient.size() != 3) throw std::runtime_error("Invalid ambient provided in medium");
+        intensity[0] = ambient[0].asFloat();
+        intensity[1] = ambient[1].asFloat();
+        intensity[2] = ambient[2].asFloat();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << endl;
+        cout << "proceding without ambient 0.1, 0.1, 0.1" << endl;
+        intensity = Vec3f(0.1,0.1,0.1);
     }
 }
 
@@ -30,9 +28,15 @@ Ambient::Ambient(): Light(){};
 
 Source::Source(Json::Value& input){
     isAmbient = false;
-    if(input.isMember("position") && input.isMember("intensity")){
+    try {
+        if(!input.isMember("position")) throw std::runtime_error("No position provided in source");
+        if(!input.isMember("intensity")) throw std::runtime_error("No intensity provided in source");
+
         Json::Value inputPos = input["position"];
         Json::Value inputIntensity = input["intensity"];
+
+        if(!inputPos.isArray() || inputPos.size() != 3) throw std::runtime_error("Invalid position provided in source");
+        if(!inputIntensity.isArray() || inputIntensity.size() != 3) throw std::runtime_error("Invalid intensity provided in source");
 
         for(int i = 0; i < 3; i++){
             intensity[i] = inputIntensity[i].asFloat();
@@ -40,11 +44,12 @@ Source::Source(Json::Value& input){
         }
         position[3] = 1;
 
-        cout << "Position: " << position[0] << " " << position[1] << " " << position[2] << " ";
-        cout << "Intensity: " << intensity[0] << " " << intensity[1] << " " << intensity[2] << endl;
 
-    }else{
-        // error handling
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << endl;
+        cout << "proceding without source light" << endl;
+        position = Vec4f(0,0,0,1);
+        intensity = Vec3f(0,0,0);
     }
 }
 

@@ -1,9 +1,9 @@
 import os
 
-executable = "./main.exe"
+executable = "./build/Raytracer"
 
 # Ensure the executable has execute permissions
-os.chmod(executable, 0o755)
+# os.chmod(executable, 0o755)
 
 # Folder of input tests
 folder_path = "test/inputs"

@@ -9,7 +9,6 @@
 #include <limits>
 #include <thread>
 #include <combination.hpp>
-#define INFINITY std::numeric_limits<float>::infinity()
 
 using std::cout, std::endl, cv::Mat;
 using std::string;
@@ -46,10 +45,19 @@ void World::readFile(const string& filename) {
         if(!scene.isMember("medium")) throw std::runtime_error("No medium light source provided in file");
         medium = scene["medium"];
         lightList.push_back(new Ambient(medium));
+
+        // recursion depth and index
+        if(!medium.isMember("index")) throw std::runtime_error("No index provided in file for medium");
+        if(!medium.isMember("recursion")) throw std::runtime_error("No recursion depth provided in file for medium");
+        index = medium["index"].asFloat();
+        recursion = medium["recursion"].asInt();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         std::cout << "using default ambient light settings" << std::endl;
+        std::cout << "using default index and recursion depth" << std::endl;
         lightList.push_back(new Ambient());
+        index = 1.0;
+        recursion = 1;
     }
 
     // setup sources
@@ -96,7 +104,8 @@ void World::readObjects(Json::Value& objects){
                                             0.0, 0.0, 0.0, 1.0);
             // for every transformation done to an object we go deeper in the json file,
             // until we get to the subject, in which case we break out of the loop.
-            objectList.push_back(setupObjects(object, matrix));
+            Object* newObject = setupObjects(object, matrix);
+            if(newObject) objectList.push_back(newObject);
         }
 
     } catch (const std::exception& e) {
@@ -250,7 +259,7 @@ Object* World::setupObjects(Json::Value& object, Mat& matrix){
         if(!rotation.isMember("subject")) throw std::runtime_error("No subject Provided for Rotation");
         return setupObjects(rotation["subject"], matrix);
     }
-
+    return finalObject;
 }
 
 
@@ -307,7 +316,7 @@ void World::calcMatrix(int startRow, int endRow, int startCol, int endCol){
         hit(ray, nullptr, &closestHit); // nullptr weil wir die kamera sind
 
         Vec3f color = {1.0,0.7,0.5};
-        if(closestHit.didHit) color = mixLight(&closestHit, 0, 2);
+        if(closestHit.didHit) color = mixLight(&closestHit, 0);
 
         else color = skyColor(ray.dir);
         row_ptr[x] = map255(color);
@@ -340,7 +349,7 @@ Vec3f map01(const Vec3b& color) {
 
 // Calculates Color / Light at a certain intersection point
 // based on all the lights in the scene
-Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce){
+Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce){
     // Vec3f color = lightList[0]->lightValue(V, P, N, object);
     Vec3f color = {0,0,0};
     for(auto light : lightList){
@@ -368,7 +377,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             color = addLight(color, incomingColor);
         }
         // calculating the reflected light
-        if(currentBounce < maxBounce) {
+        if(currentBounce < recursion) {
             // reflected
             float scalar = info->dir.dot(info->normal);
             Vec4f R = info->dir - 2*(scalar) * info->normal;
@@ -380,7 +389,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
             Vec3f rcolor;
             Vec3f Kr = info->object->getReflected();
             if(reflectedHit.didHit && reflectedHit.t > 0){
-                rcolor = mixLight(&reflectedHit, currentBounce + 1, maxBounce);
+                rcolor = mixLight(&reflectedHit, currentBounce + 1);
                 for(int i = 0; i < 3; i++){ rcolor[i] = rcolor[i] * Kr[i] * 0.5; }
             }else {
                 Vec3f sky = skyColor(reflectedRay.dir);
@@ -390,7 +399,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
 
             // refracted
             if(info->object->getRefracted() != Vec3f(0.0)){
-                float n = 1.0;
+                float n = index;
                 float nt = info->object->getIndex();
                 Vec4f T = refractedDir(n, nt, -info->dir, info->normal);
                 struct Ray refractedRay = finalRefractedRay(T, info->position, info->object);
@@ -400,7 +409,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
                 Vec3f tcolor;
                 Vec3f Kt = info->object->getRefracted();
                 if(refractedHit.didHit && refractedHit.t > 0){
-                    tcolor = mixLight(&refractedHit, currentBounce + 1, maxBounce);
+                    tcolor = mixLight(&refractedHit, currentBounce + 1);
                     for(int i = 0; i < 3; i++){ tcolor[i] = tcolor[i] * Kt[i] * 0.5; }
                 }else{
                     Vec3f sky = skyColor(refractedRay.dir);

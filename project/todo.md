@@ -24,22 +24,21 @@
     - [ ] ULM diagram
     - [x] installation guide
     - [ ] documentation of how the program works
-- [ ] get rid of the warnings
+- [x] get rid of the warnings
 - [x] replace all scalarProduct() with the opencv dotproduct function
 - [ ] automatic testing   
 - [ ] optional: optimize code performance even more
 - [ ] testing
   - [ ] more tests
   - [ ] solve exisitng test which doesnt work
-- [ ] rausfinden was mit index in ambient in der json gemeint ist
-- [ ] das recursion aus der json einfügen
-- [ ] WICHTIG: Transformation verschiebt auch schatten... soll es nucht
+- [x] rausfinden was mit index in ambient in der json gemeint ist
+- [x] das recursion aus der json einfügen
 
 ## additional features
 we have to implement at least two additional features. some ideas:
 
-- [ ] more shapes, like triangle
+- [x] more shapes, like triangle
 - [ ] sky Box / sky sphere
-- [ ] texture mapping ( i think its similaar to skysphere (at least for spheres))
+- [x] texture mapping ( i think its similaar to skysphere (at least for spheres))
 - [ ] directional light
 

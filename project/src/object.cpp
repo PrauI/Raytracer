@@ -341,7 +341,7 @@ CombinationWrapper::CombinationWrapper(Combination *combination) : combination(c
 
 Vec4f CombinationWrapper::getNormal(const Vec4f &position) {
 
-    combination->getNormal(position);
+    return combination->getNormal(position);
 }
 
 

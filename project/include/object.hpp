@@ -158,7 +158,7 @@ public:
      * @brief Sets the radius of the sphere from JSON input.
      * @param input JSON value containing the radius.
      */
-    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) override;
 
     virtual Vec4f getNormal(const Vec4f &position) override;
 
@@ -188,7 +188,7 @@ public:
      * @param scene Scene containing the half-space.
      * @param closesHit Intersection information of the closest hit.
      */
-    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) override;
 /**
      * @brief Sets the normal of the half-space from JSON input.
      * @param input JSON value containing the normal.
@@ -212,8 +212,8 @@ private:
 public:
     Combination* combination;
     CombinationWrapper(Combination* combination);
-    virtual Vec4f getNormal(const Vec4f &position);
-    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+    virtual Vec4f getNormal(const Vec4f &position) override;
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) override;
     virtual bool isIncluded(const Vec4f &point) override;
     virtual Vec3f getTextureColor(const Vec4f& point) override;
 };
@@ -239,7 +239,7 @@ public:
      * @param scene Scene containing the half-space.
      * @param closesHit Intersection information of the closest hit.
      */
-    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit) override;
 
     virtual Vec4f getNormal(const Vec4f &position) override;
 

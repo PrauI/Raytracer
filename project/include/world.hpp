@@ -21,6 +21,8 @@ struct intersectionInfo;
 class World {
     std::vector<Light*> lightList;   /**< List of lights in the world. */
     std::vector<Object*> objectList; /**< List of objects in the world. */
+    float index = 1.0;               /**< Index of refraction of the world. */
+    int recursion;                 /**< Maximum number of bounces for light rays. */
 public:
     Camera camera; /**< Camera object in the world. */
     World();
@@ -89,7 +91,7 @@ public:
      * @param maxBounce maximum number of bounces
      * @return calculated light value as a Vec3f between 0 and 1
      */
-    Vec3f mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce);
+    Vec3f mixLight(struct intersectionInfo* info, int currentBounce);
 };
 
 /**
