@@ -115,6 +115,9 @@ void World::setupObjects(Json::Value& object, Mat& matrix){
     else if(object.isMember("halfSpace")){
         finalObject = new Halfspace(object["halfSpace"], matrix);
         objectList.push_back(finalObject);
+    }else if(object.isMember("triangle")) {
+        finalObject = new Triangle(object["triangle"], matrix);
+        objectList.push_back(finalObject);
     }
     else if(object.isMember("union")) return; // todo
     else if(object.isMember("scaling")){

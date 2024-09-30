@@ -183,6 +183,10 @@ public:
 
 class Triangle: public Object{
 private:
+    Vec4f normal;
+    Vec4f v0, v1, v2;
+    Vec4f u, v;
+    Vec4f uPerp, vPerp;
 
 public:
    /**
@@ -199,7 +203,7 @@ public:
      * @param closesHit Intersection information of the closest hit.
      */
     virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
-}
+};
 /**
  * @brief Calculates the length of a vector.
  * @param x Vector whose length is to be calculated.
@@ -215,6 +219,6 @@ float length(Vec4f& x);
 void normalizeTransformationMatrix(cv::Mat& transformationMatrix);
 
 
-
+Vec4f crossProduct(Vec4f& a, Vec4f& b);
 
 #endif
