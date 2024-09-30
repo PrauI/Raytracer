@@ -208,4 +208,7 @@ To run automatic tests or a list of inputs, you can put the json files in the ``
 ```bash
 python test/test.py
 ```
-Please make sure you have python installed on your system and there exists a ```test/outputs/``` directory in which the generated images can be saved.
+This will run the program with all Json files found in the ```test/inputs``` directory. Please make sure: \ 
+- you have python installed on your system 
+- there exists a ```test/outputs/``` directory in which the generated images can be saved. If not please create one.
+- the program is built and the executable is found in the ```build/``` directory. If not please build the program by following the [installation guide](markdown/installation.md).
