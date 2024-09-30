@@ -218,6 +218,35 @@ public:
     virtual Vec3f getTextureColor(const Vec4f& point) override;
 };
 
+class Triangle: public Object{
+private:
+    Vec4f normal;
+    Vec4f v0, v1, v2;
+    Vec4f u, v;
+    Vec4f uPerp, vPerp;
+
+public:
+   /**
+    * @brief Constructs a Halfspace object from JSON input and transformation matrix.
+    * @param input JSON value containing the half-space parameters.
+    * @param matrix Transformation matrix.
+    */
+    Triangle(Json::Value& input, Mat& matrix);
+
+ /**
+     * @brief Calculates the intersection of a ray with the half-space.
+     * @param ray Ray to intersect with the half-space.
+     * @param scene Scene containing the half-space.
+     * @param closesHit Intersection information of the closest hit.
+     */
+    virtual void intersection(const struct Ray& ray, World* scene, intersectionInfo* closesHit);
+
+    virtual Vec4f getNormal(const Vec4f &position) override;
+
+    virtual bool isIncluded(const Vec4f& point) override;
+
+    virtual Vec3f getTextureColor(const Vec4f& point) override;
+};
 /**
  * @brief Calculates the length of a vector.
  * @param x Vector whose length is to be calculated.
@@ -233,7 +262,5 @@ float length(Vec4f& x);
 void normalizeTransformationMatrix(cv::Mat& transformationMatrix);
 Vec4f crossProduct(const cv::Vec4f& a, const cv::Vec4f& b);
 float mapToUnitInterval(float x, float range);
-
-
 
 #endif

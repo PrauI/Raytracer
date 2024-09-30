@@ -116,6 +116,10 @@ Object* World::setupObjects(Json::Value& object, Mat& matrix){
     else if(object.isMember("halfSpace")){
         finalObject = new Halfspace(object["halfSpace"], matrix);
         return finalObject;
+        objectList.push_back(finalObject);
+    }else if(object.isMember("triangle")) {
+        finalObject = new Triangle(object["triangle"], matrix);
+        return finalObject;
     }
     else if(object.isMember("union")) {
         Json::Value junion = object["union"];
@@ -334,7 +338,7 @@ Vec3f map01(const Vec3b& color) {
     return rgb;
 }
 
-// Calculates Color / Light at a certain intersection point 
+// Calculates Color / Light at a certain intersection point
 // based on all the lights in the scene
 Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxBounce){
     // Vec3f color = lightList[0]->lightValue(V, P, N, object);
@@ -405,7 +409,7 @@ Vec3f World::mixLight(struct intersectionInfo* info, int currentBounce, int maxB
                 color = addLight(color, tcolor);
         }
         }
-        
+
         // color += incomingColor;
     }
     for(int i = 0; i < 3; i++) if(color[i] > 1) color[i] = 1;

@@ -430,3 +430,123 @@ float mapToUnitInterval(float x, float range) {
     }
     return (result - range / 2.0f) / range + 0.5f;
 }
+
+
+Triangle::Triangle(Json::Value &input, Mat &matrix) {
+    try {
+        if(!input.isMember("position")) throw std::runtime_error("No Position provided for Triangle");
+        Json::Value inputPosition = input["position"];
+        if(!inputPosition.isArray() || inputPosition.size() != 3) throw std::runtime_error("No correct Format given for Triangle Position");
+        for(int i = 0; i < 3; i++){
+            if(!inputPosition[i].isArray() || inputPosition[i].size() != 3) throw std::runtime_error("No correct Format given for Triangle Position");
+        }
+        for(int i = 0; i < 3; i++) {
+            v0[i] = inputPosition[0][i].asFloat();
+            v1[i] = inputPosition[1][i].asFloat();
+            v2[i] = inputPosition[2][i].asFloat();
+        }
+        v0[3] = 1; v1[3] = 1; v2[3] = 1;
+
+    }catch (const std::exception& e) {
+        std::cerr << e.what() << '\n';
+        cout << "Proceeding with default triangle" << endl;
+        v0 = Vec4f(0,0,0,1);
+        v1 = Vec4f(1,0,0,1);
+        v2 = Vec4f(0,1,0,1);
+    }
+
+
+    // set normal
+    try{
+        if(!input.isMember("normal")) throw std::runtime_error("No Normal provided for Halfspace");
+        Json::Value inputNormal = input["normal"];
+        if(!inputNormal.isArray() || inputNormal.size() != 3) throw std::runtime_error("No correct Format given for Halfspace Normal");
+        for(int i = 0; i < 3; i++){
+            normal[i] = inputNormal[i].asFloat();
+        }
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+        cout << "Proceeding with normal 1,0,0" << endl;
+        normal = Vec4f(0,0,-1,0);
+    }
+
+    // set color
+    try{
+        if(!input.isMember("color")) throw std::runtime_error("No Color provided for Halfspace");
+        Json::Value inputColor = input["color"];
+        setColor(inputColor);
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+        cout << "Proceeding with default colors" << endl;
+        setDefaultColor();
+    }
+
+    // set Index
+    try{
+        if(!input.isMember("index")) throw std::runtime_error("No Index provided for Halfspace");
+        Json::Value Jindex = input["index"];
+        setIndex(Jindex);
+    }catch(const std::exception& e){
+        std::cerr << e.what() << endl;
+        cout << "Proceeding with Index: 1" << endl;
+        index = 1;
+    }
+
+    u = v1 - v0;
+    v = v2 - v0;
+    uPerp = crossProduct(u, normal);
+    vPerp = crossProduct(v, normal);
+
+    transformationMatrix = matrix.inv();
+    normalizeTransformationMatrix(transformationMatrix);
+}
+
+
+void Triangle::intersection(const struct Ray &ray, World *scene, intersectionInfo *closesHit) {
+    cv::Mat resultD = transformationMatrix * ray.dir;
+    Vec4f dm = resultD;
+    cv::Mat resulS = transformationMatrix * ray.position;
+    Vec4f Sm = resulS;
+
+    Vec4f P = crossProduct(dm, v);
+    float det = u.dot(P);
+
+    if(det < 0.0001 && det > -0.0001) return;
+
+    float invDet = 1 / det;
+
+    Vec4f T = Sm - v0;
+    float u_ = T.dot(P) * invDet;
+    if(u_ < 0 || u_ > 1) return;
+
+    Vec4f Q = crossProduct(T, u);
+    float v_ = dm.dot(Q) * invDet;
+    if(v_ < 0 || (u_ + v_) > 1) return;
+
+    float t = v.dot(Q) * invDet;
+    if(t < 0) return;
+
+    if(!closesHit->didHit || t < closesHit->t) {
+        closesHit->t = t;
+        closesHit->didHit = true;
+        closesHit->object = this;
+        closesHit->dir = -dm;
+        closesHit->position = Sm + t * dm;
+        closesHit->normal = normal;
+    }
+
+}
+
+Vec4f Triangle::getNormal(const Vec4f &position) {
+    // todo
+    return normal;
+}
+
+bool Triangle::isIncluded(const Vec4f& point) {
+    // todo
+    return false;
+}
+
+Vec3f Triangle::getTextureColor(const Vec4f& point) {
+        return Vec3f(0.0);
+}
