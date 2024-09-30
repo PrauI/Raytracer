@@ -4,6 +4,8 @@
 #include <json/json.h>
 #include <iostream>
 #include <cmath>
+#include "texture.hpp"
+#include <memory>
 
 using std::cout, std::endl, cv::Mat;
 
@@ -108,6 +110,10 @@ void Object::setColor(Json::Value& color){
         refracted[i] = color["refracted"][i].asFloat();
     }
     shininess = color["shininess"].asFloat();
+
+    if(color.isMember("texture")) {
+        texture = std::make_shared<Texture>(color["texture"]);
+    }
 }
 
 void Object::setIndex(Json::Value& Jindex){
@@ -154,6 +160,18 @@ void Sphere::intersection(const struct Ray& ray, World* scene, intersectionInfo*
 
     closesHit->position = Sm + dm * t0;
     closesHit->normal = (closesHit->position - C) / radius;
+
+    // change normal based on texture
+    if(texture != nullptr) {
+        Vec3f normalMap = getTextureColor(closesHit->position);
+        cv::normalize(normalMap, normalMap);
+        Vec4f normalMap4f(normalMap[0], normalMap[1], normalMap[2], 0.0f);
+        for(int i = 0; i < 3; i++) {
+            normalMap4f[i] = normalMap4f[i] * 2 - 1;
+        }
+        closesHit->normal = closesHit->normal + normalMap4f *0.3;
+
+    }
 
     // cout << "intersection: " << value << endl;
     return;
@@ -253,6 +271,8 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
    float t = (pos - Sm).dot(normal) / scalarValue;
     if(t < 0) return; // intersection Point behind camera
 
+    if(t >= closesHit->t) return;
+
 
     closesHit->t = t;
     closesHit->dir = -dm;
@@ -262,6 +282,16 @@ void Halfspace::intersection(const struct Ray& ray, World* scene, intersectionIn
     closesHit->position = intersectionPoint;
     closesHit->object = this;
     closesHit->normal = normal;
+
+    // change normal based on normalmap
+    if(texture == nullptr) return;
+    Vec3f normalMap = getTextureColor(closesHit->position);
+    cv::normalize(normalMap, normalMap);
+    Vec4f normalMap4f(normalMap[0], normalMap[1], normalMap[2], 0.0f);
+    for(int i = 0; i < 3; i++) {
+        normalMap4f[i] = normalMap4f[i] * 2 - 1;
+    }
+    closesHit->normal = closesHit->normal + normalMap4f *0.5;
 
     return;
 }
@@ -282,7 +312,18 @@ Vec4f Sphere::getNormal(const Vec4f &point) {
     float squaredDistance = pow(point[0] - position[0], 2) + pow(point[1] - position[1], 2) + pow(point[2] - position[2], 2);
     if(squaredDistance >= pow(radius, 2) - epsilon && squaredDistance <= pow(radius, 2) + epsilon) {
         // the point exists on the sphere surface
-        return (point - getPosition()) / radius;
+        Vec4f n = (point - position) / radius;
+        if(texture != nullptr) {
+            Vec3f normalMap = getTextureColor(point);
+            cv::normalize(normalMap, normalMap);
+            Vec4f normalMap4f(normalMap[0], normalMap[1], normalMap[2], 0.0f);
+            for(int i = 0; i < 3; i++) {
+                normalMap4f[i] = normalMap4f[i] * 2 - 1;
+            }
+            n = n + normalMap4f *0.3;
+            return n;
+
+        }
     }
     return Vec4f(0.0);
 }
@@ -319,4 +360,73 @@ bool CombinationWrapper::isIncluded(const Vec4f &point) {
 }
 
 
+bool Object::hasTexture() {
+    if(texture == nullptr) return false;
+    return true;
+}
 
+Vec3f Sphere::getTextureColor(const Vec4f &point) {
+    if(texture == nullptr) return Vec3f(0.0);
+    // calculate lat and long
+    Vec4f point_ = point - getPosition();
+    float phi = atan2(point_[1], point_[0]);
+    float theta = acos(point_[2] / radius);
+    float longitude = (phi + M_PI) / (2 * M_PI);
+    float latitude = 1 - (theta / M_PI);
+
+    return texture->getColor(longitude, latitude);
+}
+
+Vec3f Halfspace::getTextureColor(const Vec4f &point) {
+    if(texture == nullptr) return Vec3f(0.0);
+
+    // calculate two orthogoanl vektors to the normal
+    Vec4f v = Vec4f(1,0,0,0);
+    // check if v is different then normal
+    if(v.dot(normal) == 1) v = Vec4f(0,1,0,0);
+    Vec4f t1 = crossProduct(normal, v);
+    Vec4f t2 = crossProduct(normal, t1);
+    cv::normalize(t1, t1);
+    cv::normalize(t2, t2);
+
+    Vec4f point_ = point - getPosition();
+
+    // create the Matrix A from the vectors v1 and v2 (4x2 Matrix)
+    cv::Mat A = (cv::Mat_<float>(4,2) << t1[0], t2[0], t1[1], t2[1], t1[2], t2[2], t1[3], t2[3]);
+    // create the matrx for point p (4x1 Matrix)
+    cv::Mat P = (cv::Mat_<float>(4,1) << point_[0], point_[1], point_[2], point_[3]);
+
+    // solve the coefficients a and b using least squares
+    cv::Mat result;
+    cv::solve(A, P, result, cv::DECOMP_QR); // QR decomposition
+    float a = result.at<float>(0,0);
+    float b = result.at<float>(1,0);
+
+
+
+    return texture->getColor(mapToUnitInterval(a, texture->getSize()), mapToUnitInterval(b, texture->getSize()));
+
+}
+
+Vec3f CombinationWrapper::getTextureColor(const Vec4f &point) {
+    if(texture == nullptr) return Vec3f(0,0,0);
+    return Vec3f(0,0,0);
+}
+
+Vec4f crossProduct(const cv::Vec4f& a, const cv::Vec4f& b) {
+    // carefull ! this one ignores the fourth component!!
+    return cv::Vec4f(
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+        0.0f
+    );
+}
+
+float mapToUnitInterval(float x, float range) {
+    float result = std::fmod(x, range);
+    if (result < 0) {
+        result += range;
+    }
+    return (result - range / 2.0f) / range + 0.5f;
+}

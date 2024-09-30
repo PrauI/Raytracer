@@ -9,7 +9,7 @@
 
 // #define NUM_THREADS std::thread::hardware_concurrency()
 #ifndef NUM_THREADS
-#define NUM_THREADS 4
+#define NUM_THREADS 6
 #endif
 
 using cv::Vec4f, cv::Vec3f;

@@ -1,0 +1,91 @@
+{
+    "screen": {
+        "dpi": 200,
+        "dimensions": [2, 4],
+        "position": [-1, -2, -10],
+        "observer": [0, 0, -14]
+    },
+
+    "medium": {
+        "ambient": [0.1, 0.1, 0.1],
+        "index": 1,
+        "recursion": 1
+    },
+
+    "sources": [
+        {
+            "position": [50, 60, -20],
+            "intensity": [0.4, 0.5, 0.5]
+        }
+    ],
+
+    "objects": [
+        {
+            "sphere": {
+                "position": [2,-2.5,-1],
+                "radius": 1.5,
+                "color": {
+                    "ambient": [1,1,1],
+                    "diffuse": [0.1,0.1,0.1],
+                    "specular": [0.9,0.9,0.9],
+                    "reflected": [0.9,0.9,0.9],
+                    "refracted": [0.0,0.0,0.0],
+                    "shininess": 1.3
+                },
+                "index": 1
+            }
+        },
+        {
+            "sphere": {
+                "position": [0.2,2,3],
+                "radius": 2,
+                "color": {
+                    "ambient": [1,1,1],
+                    "diffuse": [0.5,0.9,0.7],
+                    "specular": [0,0.9,0.9],
+                    "reflected": [0,0,0],
+                    "refracted": [0.0,0.0,0.0],
+                    "shininess": 1
+                },
+                "index": 1
+            }
+        },
+        {
+            "halfSpace": {
+                "position": [
+                    -2,
+                    0,
+                    0
+                ],
+                "normal": [
+                    1,
+                    0,
+                    0
+                ],
+                "color": {
+                    "ambient": [
+                        1,
+                        1,
+                        1
+                    ],
+                    "diffuse": [
+                        0.3,0.3,0.3
+                    ],
+                    "specular": [
+                        1,
+                        1,
+                        1
+                    ],
+                    "reflected": [
+                        0.5,0.5,0.5
+                    ],
+                    "refracted": [
+                        0,0,0
+                    ],
+                    "shininess": 1
+                },
+                "index": 1
+            }
+        }
+        ]
+}

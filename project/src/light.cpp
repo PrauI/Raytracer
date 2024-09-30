@@ -54,6 +54,15 @@ Vec3f Ambient::lightValue(struct intersectionInfo* info){
     for(int i = 0; i < 3; i++){
         Ea[i] = intensity[i] * Ka[i];
     }
+    /**
+    if(info->object->hasTexture()) {
+        Vec3f Et = info->object->getTextureColor(info->position);
+        for(int i = 0; i < 3; i++) {
+            Et[i] *= intensity[i];
+        }
+        return addLight(Ea, Et);
+    }
+    */
     return Ea;
 }
 
@@ -74,12 +83,14 @@ Vec3f Source::lightValue(struct intersectionInfo* info){
     float scalar2 = R.dot(-info->dir);
     if(scalar2 < 0) scalar2 = 0;
 
+
      for(int i = 0; i < 3; i++){
         Ed[i] = Kd[i] * intensity[i] * scalar;
         Es[i] = Ks[i] * intensity[i] * pow(scalar2, info->object->getShininess());
     }
 
     return addLight(Ed, Es);
+
 }
 
 Vec4f Source::getPosition(){ return position; }

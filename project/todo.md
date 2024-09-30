@@ -26,13 +26,14 @@
     - [ ] documentation of how the program works
 - [ ] get rid of the warnings
 - [x] replace all scalarProduct() with the opencv dotproduct function
-- [ ] automatic testing 
+- [ ] automatic testing   
 - [ ] optional: optimize code performance even more
 - [ ] testing
   - [ ] more tests
   - [ ] solve exisitng test which doesnt work
 - [ ] rausfinden was mit index in ambient in der json gemeint ist
 - [ ] das recursion aus der json einfügen
+- [ ] WICHTIG: Transformation verschiebt auch schatten... soll es nucht
 
 ## additional features
 we have to implement at least two additional features. some ideas:

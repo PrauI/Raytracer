@@ -119,4 +119,6 @@ bool isBlocked(const Vec4f& startPoint, const Vec4f& lightPos, World* scene, Obj
 
 struct Ray finalRefractedRay(Vec4f& T, Vec4f& enterPoint, Object* object);
 
+Vec3f map01(const Vec3b& color);
+
 #endif // WORLD_HPP
