@@ -124,4 +124,5 @@ struct Ray finalRefractedRay(Vec4f& T, Vec4f& enterPoint, Object* object);
 
 Vec3f map01(const Vec3b& color);
 
+
 #endif // WORLD_HPP

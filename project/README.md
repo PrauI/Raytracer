@@ -4,10 +4,13 @@ By Zeynep Tosun, Pascal Hollinger and Philipp Rauser
 
 
 <div style = "text-align:center">
-    <img src="markdown/assets/header.png" alt="a lot of spheres" width="800"/>
+    <img src="markdown/assets/header.png" alt="a lot of spheres" width="100%"/>
     <br />
+    <em>header.json</em>
+    <img src="markdown/assets/niceOne.png" alt="nice picture" width="100%"/>
+    <br />
+    <em>niceOne.json</em>
 </div>
-<em>header.json</em>
 
 ---
 ## Table of Contents
@@ -27,6 +30,7 @@ Our raytracing program is designed to render complex scenes with high efficiency
 **Multithreading**: To enhance performance, the program utilizes multithreading, significantly speeding up the rendering process. \
 **Sky Color Rendering**: If a ray does not intersect any object, the program renders a sky color based on the angle of the ray. \
 **Normal Mapping**: Normal maps can be applied to both spheres and planes, allowing for the rendering of intricate surface details. \
+**Triangles**: The program can render triangles, enabling the creation of more complex shapes. (textures are currently disabled) \
 
 **Some Examples**:
 
@@ -58,6 +62,11 @@ Our raytracing program is designed to render complex scenes with high efficiency
         <img src="markdown/assets/textures.png" alt="scene5"/>
         <br />
         <em>textures.json</em>
+    </td>
+    <td>
+        <img src="markdown/assets/square.png" alt="scene6"/>
+        <br />
+        <em>square.json</em>
     </td>
 </tr>
 </table>

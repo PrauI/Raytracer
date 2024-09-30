@@ -263,4 +263,6 @@ void normalizeTransformationMatrix(cv::Mat& transformationMatrix);
 Vec4f crossProduct(const cv::Vec4f& a, const cv::Vec4f& b);
 float mapToUnitInterval(float x, float range);
 
+#define square
+
 #endif

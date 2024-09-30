@@ -538,15 +538,7 @@ void Triangle::intersection(const struct Ray &ray, World *scene, intersectionInf
 }
 
 Vec4f Triangle::getNormal(const Vec4f &position) {
-    if(!isIncluded(position)) return Vec4f(0.0);
-    if(texture == nullptr) return normal;
-    Vec3f normalMap = getTextureColor(position);
-    Vec4f normalMap4f(normalMap[0], normalMap[1], normalMap[2], 0.0f);
-    cv::normalize(normalMap4f, normalMap4f);
-    for(int i = 0; i < 3; i++) {
-        normalMap4f[i] = normalMap4f[i] * 2 - 1;
-    }
-    return normal + normalMap4f * 0.3;
+    return normal;
 }
 
 bool Triangle::isIncluded(const Vec4f& point) {
@@ -576,30 +568,6 @@ bool Triangle::isIncluded(const Vec4f& point) {
 }
 
 Vec3f Triangle::getTextureColor(const Vec4f& point) {
-    // Transform the point using the inverse transformation matrix
-    cv::Mat resultP = transformationMatrix * point;
-    Vec4f P = resultP;
-
-    // Compute vectors from the triangle's vertices to the point
-    Vec4f v0P = P - v0;
-    Vec4f v1P = P - v1;
-    Vec4f v2P = P - v2;
-
-    // Calculate dot products
-    float dot00 = u.dot(u);
-    float dot01 = u.dot(v);
-    float dot02 = u.dot(v0P);
-    float dot11 = v.dot(v);
-    float dot12 = v.dot(v0P);
-
-    // Compute barycentric coordinates
-    float invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
-    float u_ = (dot11 * dot02 - dot01 * dot12) * invDenom;
-    float v_ = (dot00 * dot12 - dot01 * dot02) * invDenom;
-
-    // Interpolate texture coordinates
-    cv::Vec2f texCoord = (1 - u_ - v_) * cv::Vec2f(0,1) + u_ * cv::Vec2f(1,0) + v_ * cv::Vec2f(0,0);
-    if(texture) return texture->getColor(texCoord[0], texCoord[1]);
 
     return Vec3f(0.0);
 }
