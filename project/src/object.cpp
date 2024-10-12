@@ -106,7 +106,7 @@ void Object::setColor(Json::Value& color){
         if(!color.isMember("diffuse"))  throw std::runtime_error("No diffuse color provided");
         if(!color.isMember("specular"))  throw std::runtime_error("No specular color provided");
         if(!color.isMember("reflected"))  throw std::runtime_error("No reflected color provided");
-        if(!color.isMember("refraction"))  throw std::runtime_error("No refracted color provided");
+        if(!color.isMember("refracted"))  throw std::runtime_error("No refracted color provided");
         if(!color["ambient"].isArray() || color["ambient"].size() != 3) throw std::runtime_error("No correct format given for ambient");
         if(!color["diffuse"].isArray() || color["diffuse"].size() != 3) throw std::runtime_error("No correct format given for diffuse");
         if(!color["specular"].isArray() || color["specular"].size() != 3) throw std::runtime_error("No correct format given for specular");

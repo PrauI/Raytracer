@@ -2,7 +2,8 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/CMakeLists.local.txt")
     include("${CMAKE_SOURCE_DIR}/CMakeLists.local.txt")
 
 else ()
-
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+	
     cmake_minimum_required(VERSION 3.10)
 
     # Projektname und Sprache
@@ -23,9 +24,13 @@ else ()
 
     # Füge die Bibliotheken hinzu
     # Json cpp
-    find_package(jsoncpp REQUIRED)  # Sucht nach JsonCpp
-    target_link_libraries(Raytracer PRIVATE jsoncpp_lib)  # Fügt JsonCpp hinzu
+    # find_package(jsoncpp REQUIRED)  # Sucht nach JsonCpp
+    # target_link_libraries(Raytracer PRIVATE jsoncpp_lib)  # Fügt JsonCpp hinzu
 
+    # Json cpp
+    include_directories("/opt/homebrew/Cellar/jsoncpp/1.9.5/include/")
+    target_link_libraries(Raytracer PRIVATE "/opt/homebrew/Cellar/jsoncpp/1.9.5/lib/libjsoncpp.dylib")
+    
     # OpenCV
     find_package(OpenCV REQUIRED)  # Sucht nach OpenCV
     target_link_libraries(Raytracer PRIVATE ${OpenCV_LIBS})  # Fügt OpenCV hinzu
