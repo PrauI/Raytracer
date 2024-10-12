@@ -1,8 +1,5 @@
 # Raytracing Project
 
-By Zeynep Tosun, Pascal Hollinger and Philipp Rauser
-
-
 <div style = "text-align:center">
     <img src="markdown/assets/header.png" alt="a lot of spheres" width="100%"/>
     <br />
@@ -14,11 +11,11 @@ By Zeynep Tosun, Pascal Hollinger and Philipp Rauser
 
 ---
 ## Table of Contents
-- [Showcase of the program](#showcase-of-the-program)
-- [How to render your own scene](#how-to-render-your-own-scene)
-- [installation guide](markdown/installation.md)
-- [description of the code](markdown/code_description.md)
-- [automatic testing](#running-automatic-tests)
+- [Raytracing Project](#raytracing-project)
+  - [Table of Contents](#table-of-contents)
+  - [Showcase of the program](#showcase-of-the-program)
+  - [How to render your own scene](#how-to-render-your-own-scene)
+    - [Running automatic tests](#running-automatic-tests)
 
 ---
 
