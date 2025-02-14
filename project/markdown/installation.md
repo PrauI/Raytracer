@@ -4,7 +4,7 @@
 ### Clone the git repository on your local machine
     
 ```bash
-git clone https://collaborating.tuhh.de/e-10/teaching/oop/exo/2024/g6/pixelpionners.git
+git clone https://https://github.com/PrauI/Raytracer.git
 ```
 ### Install the required libraries
 
